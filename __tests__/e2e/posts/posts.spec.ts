@@ -131,6 +131,16 @@ describe('Posts API', () => {
   })
 
   it('Should delete a post; DELETE /posts/:id', async () => {
+    const postsResBefore = await request(app)
+      .get(POSTS)
+      .expect(HttpStatus.Ok)
+
+    expect(postsResBefore.body.length).toBe(1)
+
+    await request(app)
+      .get(POSTS + `/${createdPost.id}`)
+      .expect(HttpStatus.Ok)
+
     await request(app)
       .delete(POSTS + `/${createdPost.id}`)
       .set(AUTH_HEADER_NAME, authToken)
@@ -140,11 +150,11 @@ describe('Posts API', () => {
       .get(POSTS + `/${createdPost.id}`)
       .expect(HttpStatus.NotFound)
 
-    const postsRes = await request(app)
+    const postsResAfter = await request(app)
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(postsRes.body.length).toBe(0)
+    expect(postsResAfter.body.length).toBe(0)
   })
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {

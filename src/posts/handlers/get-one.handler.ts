@@ -4,7 +4,6 @@ import { postRepository } from '../repository/post.repository'
 
 export const getOnePost = (req: Request<{ id: string }>, res: Response) => {
   const id = req.params.id
-
   const post = postRepository.getOne(id)
 
   if (!post) {
