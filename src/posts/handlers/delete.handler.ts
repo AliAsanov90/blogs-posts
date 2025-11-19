@@ -2,8 +2,8 @@ import { Request, Response } from 'express'
 import { HttpStatus } from '../../core/types/http-statuses'
 import { postRepository } from '../repository/post.repository'
 
-export const deletePost = (req: Request, res: Response) => {
-  const id = req.params.id ?? ''
+export const deletePost = (req: Request<{ id: string }>, res: Response) => {
+  const id = req.params.id
   const post = postRepository.getOne(id)
 
   if (!post) {

@@ -5,11 +5,15 @@ import { postInputDto } from '../dto/blog.dto'
 import { PostInput } from '../types/post'
 
 export const isBlogExisting = (
-  req: Request,
+  req: Request<unknown, unknown, PostInput>,
   res: Response,
   next: NextFunction,
 ) => {
-  const { blogId } = postInputDto(req.body as PostInput)
+  const { blogId } = postInputDto(req.body)
+
+  if (!blogId) {
+    return res.sendStatus(HttpStatus.BadRequest)
+  }
 
   const blog = blogRepository.getOne(blogId)
 
