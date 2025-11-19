@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { AUTH_HEADER_NAME } from '../constants/common'
 import { HttpStatus } from '../types/http-statuses'
 import { generateAuthToken } from '../utils/generate-auth-token'
 
@@ -12,7 +13,7 @@ export const authGuardMiddleware = (
 ) => {
   const { token: generatedToken } = generateAuthToken()
 
-  const auth = req.headers['authorization'] as string
+  const auth = req.headers[AUTH_HEADER_NAME.toLowerCase()] as string
 
   if (!auth) {
     return res.sendStatus(HttpStatus.Unauthorized)
