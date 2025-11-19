@@ -4,12 +4,12 @@ import { Post } from '../types/post'
 const { posts } = db
 
 const updateOrDelete = (id: string, post?: Post) => {
-  const postIndex = posts.findIndex((b) => b.id === id)
+  const postIndex = posts.findIndex((p) => p.id === id)
 
   if (post) {
-    posts.splice(postIndex, 1, post)
+    posts.splice(postIndex, 1, post) // update post
   } else {
-    posts.splice(postIndex, 1)
+    posts.splice(postIndex, 1) // delete post
   }
 }
 
@@ -18,7 +18,7 @@ const getAll = () => {
 }
 
 const getOne = (id: string) => {
-  return posts.find((b) => b.id === id) ?? null
+  return posts.find((p) => p.id === id) ?? null
 }
 
 const create = (post: Post) => {

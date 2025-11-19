@@ -42,6 +42,5 @@ postRouter
     authGuardMiddleware,
     idValidation,
     validationResultMiddleware,
-    isBlogExisting,
     deletePost,
   )

@@ -10,7 +10,6 @@ export const isBlogExisting = (
   next: NextFunction,
 ) => {
   const { blogId } = postInputDto(req.body as PostInput)
-
   const blog = blogRepository.getOne(blogId)
 
   if (!blog) {

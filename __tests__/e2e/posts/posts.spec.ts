@@ -18,6 +18,13 @@ describe('Posts API', () => {
     blogId: '1'
   }
 
+  const incorrectTestPostData: PostInput = {
+    title: '         ',
+    shortDescription: 'Test short description',
+    content: '',
+    blogId: 'blogId'
+  }
+
   let createdPost: Post
 
   beforeAll(async () => {
@@ -36,6 +43,37 @@ describe('Posts API', () => {
       .expect(HttpStatus.Created)
 
     createdPost = createdRes.body
+  })
+
+  it('Should not create a post if blog does not exist; POST /posts', async () => {
+    await request(app)
+      .post(POSTS)
+      .set('Authorization', authToken)
+      .send({ ...testPostData, blogId: '2' })
+      .expect(HttpStatus.NotFound)
+  })
+
+  it('Should not create a post without auth header; POST /posts', async () => {
+    await request(app)
+      .post(POSTS)
+      .send(testPostData)
+      .expect(HttpStatus.Unauthorized)
+  })
+
+  it('Should not create a post with incorrect auth token; POST /posts', async () => {
+    await request(app)
+      .post(POSTS)
+      .set('Authorization', 'Basic sfsdfsdsdfsdsf')
+      .send(testPostData)
+      .expect(HttpStatus.Unauthorized)
+  })
+
+  it('Should not create a post if body is incorrect; POST /posts', async () => {
+    await request(app)
+      .post(POSTS)
+      .set('Authorization', authToken)
+      .send(incorrectTestPostData)
+      .expect(HttpStatus.BadRequest)
   })
 
   it('Should get all posts; GET /posts', async () => {
@@ -69,6 +107,14 @@ describe('Posts API', () => {
     expect(updatedPostRes.body.title).toBe('Test title 2')
   })
 
+  it('Should not update a not found post; UPDATE /posts/:id', async () => {
+    await request(app)
+      .put(POSTS + '/2')
+      .set('Authorization', authToken)
+      .send({ ...testPostData, title: 'Test title 3' })
+      .expect(HttpStatus.NotFound)
+  })
+
   it('Should delete a post; DELETE /posts/:id', async () => {
     await request(app)
       .delete(POSTS + `/${createdPost.id}`)
@@ -79,10 +125,17 @@ describe('Posts API', () => {
       .get(POSTS + `/${createdPost.id}`)
       .expect(HttpStatus.NotFound)
 
-    const postsRes = await request(app)
+    const postsResAfter = await request(app)
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(postsRes.body.length).toBe(0)
+    expect(postsResAfter.body.length).toBe(0)
+  })
+
+  it('Should not delete a not found post; DELETE /posts/:id', async () => {
+    await request(app)
+      .delete(POSTS + '/2')
+      .set('Authorization', authToken)
+      .expect(HttpStatus.NotFound)
   })
 })

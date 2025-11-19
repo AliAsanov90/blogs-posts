@@ -5,10 +5,10 @@ import { postRepository } from '../repository/post.repository'
 import { Post, PostInput } from '../types/post'
 
 export const updatePost = (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response<Post, { blogName: string }>,
 ) => {
-  const id = req.params.id ?? ''
+  const id = req.params.id
   const post = postRepository.getOne(id)
 
   if (!post) {
