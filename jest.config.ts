@@ -161,7 +161,7 @@ const config: Config = {
   //   "**/__tests__/**/*.?([mc])[jt]s?(x)",
   //   "**/?(*.)+(spec|test).?([mc])[jt]s?(x)"
   // ],
-  testMatch: ["**/__tests__/**/*.ts"],
+  testMatch: ["**/__tests__/**/*.spec.ts"],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
@@ -169,7 +169,7 @@ const config: Config = {
   // ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
-  // testRegex: [],
+  // testRegex: ["/\.spec\.[cm]?[tj]sx?$/"],
 
   // This option allows the use of a custom results processor
   // testResultsProcessor: undefined,
