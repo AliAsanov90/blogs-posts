@@ -12,7 +12,7 @@ const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '1'
+  blogId: '12423423424' // should be result of Date.now()
 }
 
 const incorrectTestPostData: PostInput = {
@@ -39,7 +39,7 @@ describe('Posts API', () => {
       data: testBlogData,
     })
 
-    expect(createdBlogRes.body.id).toBe(testPostData.blogId)
+    testPostData.blogId = createdBlogRes.body.id
 
     const createdRes = await request(app)
       .post(POSTS)
