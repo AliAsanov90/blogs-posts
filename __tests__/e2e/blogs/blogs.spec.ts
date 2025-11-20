@@ -92,6 +92,14 @@ describe('Blogs API', () => {
     expect(getOneRes.body.id).toBe(createdBlog.id)
   })
 
+  it('Should return NotFound if blog not existing; GET /blogs/:id', async () => {
+    await blogsTestManager.getOne({
+      app,
+      id: '2',
+      httpStatus: HttpStatus.NotFound
+    })
+  })
+
   it('Should update a blog; PUT /blogs/:id', async () => {
     await blogsTestManager.update({
       app,
@@ -122,6 +130,14 @@ describe('Blogs API', () => {
   })
 
   it('Should delete a blog; DELETE /blogs/:id', async () => {
+    await blogsTestManager.getOne({
+      app,
+      id: createdBlog.id,
+    })
+
+    const blogsResBefore = await blogsTestManager.getAll({ app })
+    expect(blogsResBefore.body.length).toBe(1)
+
     await blogsTestManager.deleteOne({
       app,
       id: createdBlog.id,
@@ -134,9 +150,8 @@ describe('Blogs API', () => {
       httpStatus: HttpStatus.NotFound
     })
 
-    const blogsRes = await blogsTestManager.getAll({ app })
-
-    expect(blogsRes.body.length).toBe(0)
+    const blogsResAfter = await blogsTestManager.getAll({ app })
+    expect(blogsResAfter.body.length).toBe(0)
   })
 
   it('Should not delete a not found blog; DELETE /blogs/:id', async () => {

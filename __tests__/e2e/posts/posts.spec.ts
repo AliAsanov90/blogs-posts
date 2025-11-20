@@ -12,7 +12,7 @@ const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '1'
+  blogId: '12423423424' // should be result of Date.now()
 }
 
 const incorrectTestPostData: PostInput = {
@@ -39,7 +39,7 @@ describe('Posts API', () => {
       data: testBlogData,
     })
 
-    expect(createdBlogRes.body.id).toBe(testPostData.blogId)
+    testPostData.blogId = createdBlogRes.body.id
 
     const createdRes = await request(app)
       .post(POSTS)
@@ -131,6 +131,16 @@ describe('Posts API', () => {
   })
 
   it('Should delete a post; DELETE /posts/:id', async () => {
+    const postsResBefore = await request(app)
+      .get(POSTS)
+      .expect(HttpStatus.Ok)
+
+    expect(postsResBefore.body.length).toBe(1)
+
+    await request(app)
+      .get(POSTS + `/${createdPost.id}`)
+      .expect(HttpStatus.Ok)
+
     await request(app)
       .delete(POSTS + `/${createdPost.id}`)
       .set(AUTH_HEADER_NAME, authToken)
@@ -140,11 +150,11 @@ describe('Posts API', () => {
       .get(POSTS + `/${createdPost.id}`)
       .expect(HttpStatus.NotFound)
 
-    const postsRes = await request(app)
+    const postsResAfter = await request(app)
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(postsRes.body.length).toBe(0)
+    expect(postsResAfter.body.length).toBe(0)
   })
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {
