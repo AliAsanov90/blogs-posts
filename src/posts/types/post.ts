@@ -5,7 +5,11 @@ export type PostInput = {
   blogId: string
 }
 
-export type Post = {
-  id: string
+export type Post = PostInput & {
   blogName: string
-} & PostInput
+  createdAt: Date
+}
+
+export type PostViewModel = Post & {
+  id: string
+}

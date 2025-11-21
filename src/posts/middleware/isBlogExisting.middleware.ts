@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { blogRepository } from '../../blogs/repository/blog.repository'
+import { blogRepository } from '../../blogs/repository/blog.repository.mongo'
 import { HttpStatus } from '../../core/types/http-statuses'
 import { postInputDto } from '../dto/blog.dto'
 import { PostInput } from '../types/post'
 
-export const isBlogExisting = (
+export const isBlogExisting = async (
   req: Request<unknown, unknown, PostInput>,
   res: Response,
   next: NextFunction,
@@ -15,7 +15,7 @@ export const isBlogExisting = (
     return res.sendStatus(HttpStatus.BadRequest)
   }
 
-  const blog = blogRepository.getOne(blogId)
+  const blog = await blogRepository.getOne(blogId)
 
   if (!blog) {
     return res.sendStatus(HttpStatus.NotFound)
