@@ -4,4 +4,11 @@ export type BlogInput = {
   websiteUrl: string
 }
 
-export type Blog = { id: string } & BlogInput
+export type Blog = BlogInput & {
+  createdAt: Date
+  isMembership: boolean
+}
+
+export type BlogViewModel = Blog & {
+  id: string
+}

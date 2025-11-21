@@ -1,37 +1,46 @@
-import { db } from '../../db/in-memory.db'
+import { ObjectId, WithId } from 'mongodb'
+import { postsCollection } from '../../db/mongo.db'
 import { Post } from '../types/post'
 
-const { posts } = db
+const getAll = async (): Promise<WithId<Post>[]> => {
+  return postsCollection.find().toArray()
+}
 
-const updateOrDelete = (id: string, post?: Post) => {
-  const postIndex = posts.findIndex((p) => p.id === id)
+const getOne = async (id: string): Promise<WithId<Post> | null> => {
+  return postsCollection.findOne({ _id: new ObjectId(id) })
+}
 
-  if (post) {
-    posts.splice(postIndex, 1, post) // update post
-  } else {
-    posts.splice(postIndex, 1) // delete post
+const create = async (post: Post): Promise<WithId<Post>> => {
+  const { insertedId } = await postsCollection.insertOne(post)
+  return { ...post, _id: insertedId }
+}
+
+const update = async (id: string, post: Post): Promise<void> => {
+  const { matchedCount } = await postsCollection.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogName: post.blogName,
+        blogId: post.blogId,
+        createdAt: post.createdAt,
+      }
+    }
+  )
+
+  if (matchedCount < 1) {
+    throw new Error('Post does not exist')
   }
 }
 
-const getAll = () => {
-  return posts
-}
+const deleteOne = async (id: string): Promise<void> => {
+  const { deletedCount } = await postsCollection.deleteOne({ _id: new ObjectId(id) })
 
-const getOne = (id: string) => {
-  return posts.find((p) => p.id === id) ?? null
-}
-
-const create = (post: Post) => {
-  posts.push(post)
-  return post
-}
-
-const update = (id: string, post: Post) => {
-  updateOrDelete(id, post)
-}
-
-const deleteOne = (id: string) => {
-  updateOrDelete(id)
+  if (deletedCount < 1) {
+    throw new Error('Post does not exist')
+  }
 }
 
 export const postRepository = {

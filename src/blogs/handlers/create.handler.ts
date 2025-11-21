@@ -1,17 +1,18 @@
 import { Request, Response } from 'express'
 import { HttpStatus } from '../../core/types/http-statuses'
-import { db } from '../../db/in-memory.db'
 import { blogInputDto } from '../dto/blog.dto'
-import { blogRepository } from '../repository/blog.repository'
+import { blogRepository } from '../repository/blog.repository.mongo'
 import { Blog, BlogInput } from '../types/blog'
+import { mapToBlogViewModel } from '../utils/map-to-blog-view-model.util'
 
-export const createBlog = (req: Request, res: Response) => {
+export const createBlog = async (req: Request, res: Response) => {
   const newBlog: Blog = {
-    id: String(db.blogs.length + 1),
     ...blogInputDto(req.body as BlogInput),
+    isMembership: false,
+    createdAt: new Date()
   }
 
-  const createdBlog = blogRepository.create(newBlog)
+  const createdBlog = await blogRepository.create(newBlog)
 
-  res.status(HttpStatus.Created).send(createdBlog)
+  res.status(HttpStatus.Created).send(mapToBlogViewModel(createdBlog))
 }

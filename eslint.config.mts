@@ -1,17 +1,17 @@
 // eslint.config.mjs
 import stylistic from '@stylistic/eslint-plugin'
-import prettierConfig from "eslint-config-prettier"
-import prettierPlugin from "eslint-plugin-prettier"
-import { defineConfig } from "eslint/config"
-import globals from "globals"
-import tseslint from "typescript-eslint"
+import prettierConfig from 'eslint-config-prettier'
+import prettierPlugin from 'eslint-plugin-prettier'
+import { defineConfig } from 'eslint/config'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 export default defineConfig([
   // ───────────────────────────────────────────────
   // 1. ESLint config files should NOT be type-checked
   // ───────────────────────────────────────────────
   {
-    files: ["eslint.config.*", "*.config.*", "*.config.*.cjs", "*.config.*.mjs"],
+    files: ['eslint.config.*', '*.config.*', '*.config.*.cjs', '*.config.*.mjs'],
     languageOptions: {
       parserOptions: {
         project: null, // disable type-aware linting for config
@@ -23,19 +23,19 @@ export default defineConfig([
   // 2. Base JS/TS rules for all source files
   // ───────────────────────────────────────────────
   {
-    files: ["src/**/*.{ts,cts,mts,js,cjs,mjs}"],
-    ignores: ["dist/**", "node_modules/**"],
+    files: ['src/**/*.{ts,cts,mts,js,cjs,mjs}'],
+    ignores: ['dist/**', 'node_modules/**'],
 
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
         ...globals.node, // Node environment
         ...globals.jest, // Jest environment
         ...globals.browser, // optional if you have browser code
       },
       parserOptions: {
-        project: "./tsconfig.json", // matches your tsconfig
+        project: './tsconfig.json', // matches your tsconfig
         tsconfigRootDir: process.cwd(),
       },
     },
@@ -46,12 +46,13 @@ export default defineConfig([
     },
 
     rules: {
-      "no-console": "warn",
-      semi: ["error", "always"],
-      quotes: ["error", "single"],
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@stylistic/newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
-      "prettier/prettier": "error",
+      'no-console': 'warn',
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/restrict-template-expressions': ['error', { allow: [{ name: 'error' }] }],
+      '@stylistic/newline-per-chained-call': ['error', { 'ignoreChainWithDepth': 2 }],
+      'prettier/prettier': 'error',
     },
   },
 
