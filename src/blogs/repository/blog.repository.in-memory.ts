@@ -1,9 +1,9 @@
 import { db } from '../../db/in-memory.db'
-import { Blog } from '../types/blog'
+import { BlogViewModel } from '../types/blog'
 
 const { blogs } = db
 
-const updateOrDeleteBlog = (id: string, blog?: Blog) => {
+const updateOrDeleteBlog = (id: string, blog?: BlogViewModel) => {
   const blogIndex = blogs.findIndex((b) => b.id === id)
 
   if (blog) {
@@ -21,12 +21,12 @@ const getOne = (id: string) => {
   return blogs.find((b) => b.id === id) ?? null
 }
 
-const create = (blog: Blog) => {
+const create = (blog: BlogViewModel) => {
   blogs.push(blog)
   return blog
 }
 
-const update = (id: string, blog: Blog) => {
+const update = (id: string, blog: BlogViewModel) => {
   updateOrDeleteBlog(id, blog)
 }
 

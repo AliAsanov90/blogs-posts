@@ -27,11 +27,11 @@ export const runDb = async (): Promise<void> => {
 
     await client.connect()
     await db.command({ ping: 1 })
-    // eslint-disable-next-line no-console
     console.log('✅ Connected to the database')
   } catch (error: unknown) {
     await client.close()
-    throw new Error(`❌ Database not connected: ${error}`)
+    console.error(error)
+    throw new Error('❌ Database not connected...')
   }
 }
 

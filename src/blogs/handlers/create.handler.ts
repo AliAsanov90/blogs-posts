@@ -9,7 +9,7 @@ export const createBlog = async (req: Request, res: Response) => {
   const newBlog: Blog = {
     ...blogInputDto(req.body as BlogInput),
     isMembership: false,
-    createdAt: new Date()
+    createdAt: new Date(),
   }
 
   const createdBlog = await blogRepository.create(newBlog)

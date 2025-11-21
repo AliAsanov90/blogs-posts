@@ -3,7 +3,10 @@ import { HttpStatus } from '../../core/types/http-statuses'
 import { blogRepository } from '../repository/blog.repository.mongo'
 import { mapToBlogViewModel } from '../utils/map-to-blog-view-model.util'
 
-export const getOneBlog = async (req: Request<{ id: string }>, res: Response) => {
+export const getOneBlog = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const id = req.params.id
   const blog = await blogRepository.getOne(id)
 

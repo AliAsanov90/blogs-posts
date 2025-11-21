@@ -6,7 +6,5 @@ import { mapToBlogViewModel } from '../utils/map-to-blog-view-model.util'
 export const getAllBlogs = async (req: Request, res: Response) => {
   const blogs = await blogRepository.getAll()
 
-  res
-    .status(HttpStatus.Ok)
-    .send(blogs.map(mapToBlogViewModel))
+  res.status(HttpStatus.Ok).send(blogs.map(mapToBlogViewModel))
 }

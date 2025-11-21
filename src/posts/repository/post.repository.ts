@@ -26,8 +26,8 @@ const update = async (id: string, post: Post): Promise<void> => {
         blogName: post.blogName,
         blogId: post.blogId,
         createdAt: post.createdAt,
-      }
-    }
+      },
+    },
   )
 
   if (matchedCount < 1) {
@@ -36,7 +36,9 @@ const update = async (id: string, post: Post): Promise<void> => {
 }
 
 const deleteOne = async (id: string): Promise<void> => {
-  const { deletedCount } = await postsCollection.deleteOne({ _id: new ObjectId(id) })
+  const { deletedCount } = await postsCollection.deleteOne({
+    _id: new ObjectId(id),
+  })
 
   if (deletedCount < 1) {
     throw new Error('Post does not exist')

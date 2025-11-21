@@ -46,11 +46,13 @@ export default defineConfig([
     },
 
     rules: {
-      'no-console': 'warn',
+      'no-console': 'off',
       semi: ['error', 'always'],
       quotes: ['error', 'single'],
       '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/restrict-template-expressions': ['error', { allow: [{ name: 'error' }] }],
+      // '@typescript-eslint/restrict-template-expressions': ['error', {
+      //   allow: [{ 'name': 'error', 'from': 'lib' }]
+      // }],
       '@stylistic/newline-per-chained-call': ['error', { 'ignoreChainWithDepth': 2 }],
       'prettier/prettier': 'error',
     },

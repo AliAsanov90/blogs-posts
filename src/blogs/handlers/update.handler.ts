@@ -4,7 +4,10 @@ import { blogInputDto } from '../dto/blog.dto'
 import { blogRepository } from '../repository/blog.repository.mongo'
 import { BlogInput } from '../types/blog'
 
-export const updateBlog = async (req: Request<{ id: string }>, res: Response) => {
+export const updateBlog = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const id = req.params.id
   const blog = await blogRepository.getOne(id)
 

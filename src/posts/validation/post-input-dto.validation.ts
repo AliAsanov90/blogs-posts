@@ -43,8 +43,6 @@ const blogIdValidation = body('blogId')
   .withMessage('name field should not be empty')
   .isMongoId()
   .withMessage('blogId field should be of correct format of Mongo ObjectId')
-  // .isNumeric()
-  // .withMessage('blogId field should be numeric')
 
 export const postInputDtoValidation = [
   titleValidation,
