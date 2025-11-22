@@ -9,8 +9,8 @@
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
     "target": "es2016",
-    "types": [],
-    // For nodejs:
+    "types": ["node"],
+    // For Node.js:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
