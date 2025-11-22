@@ -1,4 +1,4 @@
-import { db } from '../../db/in-memory.db'
+import { db } from '../../../db/in-memory.db'
 import { BlogViewModel } from '../types/blog'
 
 const { blogs } = db

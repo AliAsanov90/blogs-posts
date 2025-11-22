@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { HttpStatus } from '../../core/types/http-statuses'
-import { blogsCollection, postsCollection } from '../../db/mongo.db'
+import { HttpStatus } from '../../../common/types/http-statuses'
+import { blogsCollection, postsCollection } from '../../../db/mongo.db'
 
 export const deleteAllData = async (req: Request, res: Response) => {
   await Promise.all([

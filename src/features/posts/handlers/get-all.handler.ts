@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { HttpStatus } from '../../core/types/http-statuses'
+import { HttpStatus } from '../../../common/types/http-statuses'
 import { postRepository } from '../repository/post.repository'
 import { mapToPostViewModel } from '../utils/map-to-post-view-model.util'
 

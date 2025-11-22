@@ -1,8 +1,8 @@
 import express, { Application } from 'express'
-import { blogRouter } from './blogs/routers/blog.router'
 import { BLOGS, HOME, POSTS, TESTING } from './common/constants/routes'
-import { postRouter } from './posts/routers/post.router'
-import { testingRouter } from './testing/routers/testing.router'
+import { blogRouter } from './features/blogs/routers/blog.router'
+import { postRouter } from './features/posts/routers/post.router'
+import { testingRouter } from './features/testing/routers/testing.router'
 
 export const setupApp = (): Application => {
   const app = express()

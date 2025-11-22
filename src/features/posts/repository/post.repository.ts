@@ -1,5 +1,5 @@
 import { ObjectId, WithId } from 'mongodb'
-import { postsCollection } from '../../db/mongo.db'
+import { postsCollection } from '../../../db/mongo.db'
 import { Post } from '../types/post'
 
 const getAll = async (): Promise<WithId<Post>[]> => {

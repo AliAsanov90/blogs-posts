@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { HttpStatus } from '../../core/types/http-statuses'
+import { HttpStatus } from '../../../common/types/http-statuses'
 import { blogInputDto } from '../dto/blog.dto'
 import { blogRepository } from '../repository/blog.repository.mongo'
 import { Blog, BlogInput } from '../types/blog'

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
+import { HttpStatus } from '../../../common/types/http-statuses'
 import { blogRepository } from '../../blogs/repository/blog.repository.mongo'
-import { HttpStatus } from '../../core/types/http-statuses'
 import { postInputDto } from '../dto/blog.dto'
 import { PostInput } from '../types/post'
 
