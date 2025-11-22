@@ -1,12 +1,12 @@
-import request from 'supertest'
-import { Blog, BlogInput } from '../../../src/blogs/types/blog'
-import { TESTING_ALL_DATA } from '../../../src/core/constants/routes'
+import { BlogInput, BlogViewModel } from '../../../src/blogs/types/blog'
 import { HttpStatus } from '../../../src/core/types/http-statuses'
 import { generateAuthToken } from '../../../src/core/utils/generate-auth-token'
+import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
+import { clearDb } from '../../utils/clearDb.util'
 
-export const testBlogData: BlogInput = {
+const testBlogData: BlogInput = {
   name: 'Test name',
   description: 'Test description',
   websiteUrl: 'https://website-url.com',
@@ -23,14 +23,19 @@ const incorrectTestBlogData: BlogInput = {
   websiteUrl: 'websiteUrl'
 }
 
-let createdBlog: Blog
+let createdBlog: BlogViewModel
 
 describe('Blogs API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
 
   beforeAll(async () => {
-    await request(app).delete(TESTING_ALL_DATA).expect(HttpStatus.NoContent)
+    await runDb()
+  })
+
+  afterAll(async () => {
+    await clearDb(app)
+    closeDb()
   })
 
   it('Should create a blog; POST /blogs', async () => {
@@ -95,7 +100,7 @@ describe('Blogs API', () => {
   it('Should return NotFound if blog not existing; GET /blogs/:id', async () => {
     await blogsTestManager.getOne({
       app,
-      id: '2',
+      id: '691fe02e62d2354296c74851',
       httpStatus: HttpStatus.NotFound
     })
   })
@@ -114,6 +119,7 @@ describe('Blogs API', () => {
     })
 
     expect(updatedPostRes.body).toEqual({
+      ...updatedPostRes.body,
       ...updatedTestBlogData,
       id: createdBlog.id
     })
@@ -122,7 +128,7 @@ describe('Blogs API', () => {
   it('Should not update blog if blog not found; UPDATE /blogs/:id', async () => {
     await blogsTestManager.update({
       app,
-      id: '2',
+      id: '691fe02e62d2354296c74851',
       token: authToken,
       data: testBlogData,
       httpStatus: HttpStatus.NotFound
@@ -157,7 +163,7 @@ describe('Blogs API', () => {
   it('Should not delete a not found blog; DELETE /blogs/:id', async () => {
     await blogsTestManager.deleteOne({
       app,
-      id: '2',
+      id: '691fe02e62d2354296c74851',
       token: authToken,
       httpStatus: HttpStatus.NotFound
     })

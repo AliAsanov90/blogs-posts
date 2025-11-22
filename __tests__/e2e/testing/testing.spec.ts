@@ -1,17 +1,28 @@
 import request from 'supertest'
 import { BLOGS, POSTS, TESTING_ALL_DATA } from '../../../src/core/constants/routes'
 import { HttpStatus } from '../../../src/core/types/http-statuses'
+import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { setupApp } from '../../../src/setupApp'
 
 describe('Testing API', () => {
   const app = setupApp()
 
+  beforeAll(async () => {
+    await runDb()
+  })
+
+  afterAll(async () => {
+    closeDb()
+  })
+
   it('Should delete all blogs and posts', async () => {
-    const res = await request(app).delete(TESTING_ALL_DATA)
+    await request(app)
+      .delete(TESTING_ALL_DATA)
+      .expect(HttpStatus.NoContent)
+
     const blogsRes = await request(app).get(BLOGS)
     const postsRes = await request(app).get(POSTS)
 
-    expect(res.status).toBe(HttpStatus.NoContent)
     expect(blogsRes.body).toHaveLength(0)
     expect(postsRes.body).toHaveLength(0)
   });

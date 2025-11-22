@@ -1,9 +1,8 @@
-import { Blog } from '../blogs/types/blog'
-import { Post } from '../posts/types/post'
+import { BlogViewModel } from '../blogs/types/blog'
 
 type DB = {
-  blogs: Blog[]
-  posts: Post[]
+  blogs: BlogViewModel[]
+  posts: BlogViewModel[]
 }
 
 export const db: DB = {

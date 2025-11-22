@@ -1,8 +1,12 @@
 import { Request, Response } from 'express'
 import { HttpStatus } from '../../core/types/http-statuses'
 import { blogRepository } from '../repository/blog.repository.mongo'
+import { mapToBlogViewModel } from '../utils/map-to-blog-view-model.util'
 
-export const deleteBlog = async (req: Request<{ id: string }>, res: Response) => {
+export const getOneBlog = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const id = req.params.id
   const blog = await blogRepository.getOne(id)
 
@@ -10,7 +14,5 @@ export const deleteBlog = async (req: Request<{ id: string }>, res: Response) =>
     return res.sendStatus(HttpStatus.NotFound)
   }
 
-  await blogRepository.deleteOne(id)
-
-  res.sendStatus(HttpStatus.NoContent)
+  return res.status(HttpStatus.Ok).send(mapToBlogViewModel(blog))
 }

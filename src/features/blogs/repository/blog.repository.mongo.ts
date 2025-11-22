@@ -2,7 +2,6 @@ import { ObjectId, WithId } from 'mongodb'
 import { blogsCollection } from '../../db/mongo.db'
 import { Blog } from '../types/blog'
 
-
 const getAll = async (): Promise<WithId<Blog>[]> => {
   return blogsCollection.find().toArray()
 }
@@ -24,8 +23,8 @@ const update = async (id: string, blog: Blog): Promise<void> => {
         name: blog.name,
         description: blog.description,
         websiteUrl: blog.websiteUrl,
-      }
-    }
+      },
+    },
   )
 
   if (matchedCount < 1) {
@@ -34,7 +33,9 @@ const update = async (id: string, blog: Blog): Promise<void> => {
 }
 
 const deleteOne = async (id: string): Promise<void> => {
-  const { deletedCount } = await blogsCollection.deleteOne({ _id: new ObjectId(id) })
+  const { deletedCount } = await blogsCollection.deleteOne({
+    _id: new ObjectId(id),
+  })
 
   if (deletedCount < 1) {
     throw new Error('Blog does not exist')

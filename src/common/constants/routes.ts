@@ -3,7 +3,7 @@ export const ID = '/:id'
 
 export const TESTING = '/testing'
 export const ALL_DATA = '/all-data'
-export const TESTING_ALL_DATA = '/testing/all-data'
+export const TESTING_ALL_DATA = `${TESTING}${ALL_DATA}`
 
 export const BLOGS = '/blogs'
 

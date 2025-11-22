@@ -1,18 +1,26 @@
 import request from 'supertest'
+import { BlogInput } from '../../../src/blogs/types/blog'
 import { AUTH_HEADER_NAME } from '../../../src/core/constants/common'
-import { POSTS, TESTING_ALL_DATA } from '../../../src/core/constants/routes'
+import { POSTS } from '../../../src/core/constants/routes'
 import { HttpStatus } from '../../../src/core/types/http-statuses'
 import { generateAuthToken } from '../../../src/core/utils/generate-auth-token'
-import { Post, PostInput } from '../../../src/posts/types/post'
+import { closeDb, runDb } from '../../../src/db/mongo.db'
+import { PostInput, PostViewModel } from '../../../src/posts/types/post'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
-import { testBlogData } from '../blogs/blogs.spec'
+import { clearDb } from '../../utils/clearDb.util'
+
+const testBlogData: BlogInput = {
+  name: 'Test name',
+  description: 'Test description',
+  websiteUrl: 'https://website-url.com',
+}
 
 const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '12423423424' // should be result of Date.now()
+  blogId: '691fe02e62d2354296c74857'
 }
 
 const incorrectTestPostData: PostInput = {
@@ -22,14 +30,19 @@ const incorrectTestPostData: PostInput = {
   blogId: 'blogId'
 }
 
-let createdPost: Post
+let createdPost: PostViewModel
 
 describe('Posts API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
 
   beforeAll(async () => {
-    await request(app).delete(TESTING_ALL_DATA).expect(HttpStatus.NoContent)
+    await runDb()
+  })
+
+  afterAll(async () => {
+    await clearDb(app)
+    closeDb()
   })
 
   it('Should create a post; POST /posts', async () => {
@@ -54,7 +67,7 @@ describe('Posts API', () => {
     await request(app)
       .post(POSTS)
       .set(AUTH_HEADER_NAME, authToken)
-      .send({ ...testPostData, blogId: '2' })
+      .send({ ...testPostData, blogId: '691fe02e62d2354296c74851' })
       .expect(HttpStatus.NotFound)
   })
 
@@ -124,7 +137,7 @@ describe('Posts API', () => {
 
   it('Should not update a not found post; UPDATE /posts/:id', async () => {
     await request(app)
-      .put(POSTS + '/2')
+      .put(POSTS + '/691fe02e62d2354296c74851')
       .set(AUTH_HEADER_NAME, authToken)
       .send({ ...testPostData, title: 'Test title 3' })
       .expect(HttpStatus.NotFound)
@@ -159,7 +172,7 @@ describe('Posts API', () => {
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {
     await request(app)
-      .delete(POSTS + '/2')
+      .delete(POSTS + '/691fe02e62d2354296c74851')
       .set(AUTH_HEADER_NAME, authToken)
       .expect(HttpStatus.NotFound)
   })

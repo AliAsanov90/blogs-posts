@@ -1,7 +1,6 @@
-import 'dotenv/config'
 import express, { Application } from 'express'
 import { blogRouter } from './blogs/routers/blog.router'
-import { BLOGS, HOME, POSTS, TESTING } from './core/constants/routes'
+import { BLOGS, HOME, POSTS, TESTING } from './common/constants/routes'
 import { postRouter } from './posts/routers/post.router'
 import { testingRouter } from './testing/routers/testing.router'
 

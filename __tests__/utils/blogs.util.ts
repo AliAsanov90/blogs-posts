@@ -36,7 +36,7 @@ const create = async ({ app, token = '', data, httpStatus = HttpStatus.Created }
 }
 
 const update = async ({ app, token= '', data, id, httpStatus = HttpStatus.NoContent }: UpdateParams) => {
-  await request(app)
+  return await request(app)
     .put(BLOGS + `/${id}`)
     .set(AUTH_HEADER_NAME, token)
     .send(data)
@@ -44,7 +44,7 @@ const update = async ({ app, token= '', data, id, httpStatus = HttpStatus.NoCont
 }
 
 const deleteOne = async ({ app, token = '', id, httpStatus = HttpStatus.NoContent }: DeleteParams) => {
-  await request(app)
+  return await request(app)
     .delete(BLOGS + `/${id}`)
     .set(AUTH_HEADER_NAME, token)
     .expect(httpStatus)

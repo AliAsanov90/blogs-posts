@@ -13,8 +13,8 @@
     "dev:watch": "concurrently 'pnpm ts:watch' 'pnpm dev'",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "lint:fix": "eslint 'src/**/*.{ts,js}' --fix",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest --runInBand --detectOpenHandles",
+    "test:watch": "jest --runInBand --detectOpenHandles --watch"
   },
   "dependencies": {
     "dotenv": "^17.2.3",

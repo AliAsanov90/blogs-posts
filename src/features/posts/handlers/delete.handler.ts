@@ -2,7 +2,10 @@ import { Request, Response } from 'express'
 import { HttpStatus } from '../../core/types/http-statuses'
 import { postRepository } from '../repository/post.repository'
 
-export const deletePost = async (req: Request<{ id: string }>, res: Response) => {
+export const deletePost = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const id = req.params.id
   const post = await postRepository.getOne(id)
 
