@@ -35,7 +35,7 @@ const websiteUrlValidation = body('websiteUrl')
   .matches('^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$')
   .withMessage('websiteUrl must start with https and be a valid domain/path')
 
-export const blogInputDtoValidation = [
+export const blogInputValidation = [
   nameValidation,
   descriptionValidation,
   websiteUrlValidation,

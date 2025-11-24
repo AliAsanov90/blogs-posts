@@ -1,5 +1,5 @@
 import { Collection, Db, MongoClient } from 'mongodb'
-import { Blog } from '../features/blogs/types/blog'
+import { Blog } from '../features/blogs/types/blog.types'
 import { Post } from '../features/posts/types/post'
 
 const DB_URL = process.env.MONGO_URL

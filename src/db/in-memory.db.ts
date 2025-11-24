@@ -1,4 +1,4 @@
-import { BlogViewModel } from '../features/blogs/types/blog'
+import { BlogViewModel } from '../features/blogs/types/blog.types'
 
 type DB = {
   blogs: BlogViewModel[]

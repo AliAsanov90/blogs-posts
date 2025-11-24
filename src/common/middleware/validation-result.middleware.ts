@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { ValidationError, validationResult } from 'express-validator'
 import { HttpStatus } from '../types/http-statuses'
 import { ValidationAppError } from '../types/validation-error'
-import { createErrorMessages } from '../utils/error.util'
+import { createErrorMessages } from '../utils/handle-errors.util'
 
 const formatErrors = (e: ValidationError): ValidationAppError =>
   e.type === 'field'
