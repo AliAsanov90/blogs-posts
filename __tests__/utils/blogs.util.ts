@@ -2,8 +2,8 @@ import { Application } from 'express'
 import request from 'supertest'
 import { AUTH_HEADER_NAME } from '../../src/common/constants/common'
 import { BLOGS } from '../../src/common/constants/routes'
-import { HttpStatus } from '../../src/common/types/http-statuses'
-import { BlogInput } from '../../src/features/blogs/types/blog'
+import { HttpStatus } from '../../src/common/types/http-statuses.types'
+import { BlogInput } from '../../src/features/blogs/types/blog.types'
 
 type GetAllParams = {
   app: Application

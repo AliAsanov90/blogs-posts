@@ -1,7 +1,10 @@
 import { Response } from 'express'
-import { NotFoundError } from '../errors/not-found.error'
-import { HttpStatus } from '../types/http-statuses'
-import { ErrorMessages, ValidationAppError } from '../types/validation-error'
+import { BadRequestError, NotFoundError } from '../types/errors.types'
+import { HttpStatus } from '../types/http-statuses.types'
+import {
+  ErrorMessages,
+  ValidationAppError,
+} from '../types/validation-error.types'
 
 export const createErrorMessages = (
   errors: ValidationAppError[],
@@ -9,13 +12,25 @@ export const createErrorMessages = (
   return { errorsMessages: errors }
 }
 
+const getErrorResponseObj = <T extends Error, K extends Response>(
+  err: T,
+  errStatus: HttpStatus,
+  res: K,
+) => {
+  return res.status(errStatus).json({
+    message: err.message,
+    name: err.name,
+    status: errStatus,
+  })
+}
+
 export const handleErrors = <K extends Response>(error: unknown, res: K) => {
   if (error instanceof NotFoundError) {
-    return res.status(HttpStatus.NotFound).json({
-      message: error.message,
-      name: error.name,
-      status: HttpStatus.NotFound,
-    })
+    return getErrorResponseObj(error, NotFoundError.httpStatus, res)
+  }
+
+  if (error instanceof BadRequestError) {
+    return getErrorResponseObj(error, BadRequestError.httpStatus, res)
   }
 
   res.status(HttpStatus.InternalServerError).json({
