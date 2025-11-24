@@ -13,3 +13,8 @@ export type Post = PostInput & {
 export type PostViewModel = Post & {
   id: string
 }
+
+export enum SortByPostFields {
+  CreatedAt = 'createdAt',
+  Title = 'title',
+}

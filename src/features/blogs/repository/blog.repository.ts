@@ -1,6 +1,6 @@
 import { ObjectId, WithId } from 'mongodb'
-import { blogsCollection } from '../../db/mongo.db'
-import { Blog } from './types/blog.types'
+import { blogsCollection } from '../../../db/mongo.db'
+import { Blog } from '../types/blog.types'
 
 class BlogRepository {
   public async getAll(): Promise<WithId<Blog>[]> {

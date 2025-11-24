@@ -5,7 +5,7 @@ import { POSTS } from '../../../src/common/constants/routes'
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
-import { BlogInput, BlogViewModel } from '../../../src/features/blogs/types/blog.types'
+import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.types'
 import { PostInput, PostViewModel } from '../../../src/features/posts/types/post.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
@@ -31,7 +31,7 @@ const incorrectTestPostData: PostInput = {
   blogId: 'blogId'
 }
 
-let createdBlog: BlogViewModel
+let createdBlog: BlogOutput
 let createdPost: PostViewModel
 
 describe('Posts API', () => {
