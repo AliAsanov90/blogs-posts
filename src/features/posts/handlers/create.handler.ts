@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { HttpStatus } from '../../core/types/http-statuses'
-import { postInputDto } from '../dto/blog.dto'
+import { HttpStatus } from '../../../common/types/http-statuses'
+import { postInputDto } from '../dto/post.dto'
 import { postRepository } from '../repository/post.repository'
 import { Post, PostInput } from '../types/post'
 import { mapToPostViewModel } from '../utils/map-to-post-view-model.util'

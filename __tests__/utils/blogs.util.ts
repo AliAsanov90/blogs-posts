@@ -1,9 +1,9 @@
 import { Application } from 'express'
 import request from 'supertest'
-import { BlogInput } from '../../src/blogs/types/blog'
-import { AUTH_HEADER_NAME } from '../../src/core/constants/common'
-import { BLOGS } from '../../src/core/constants/routes'
-import { HttpStatus } from '../../src/core/types/http-statuses'
+import { AUTH_HEADER_NAME } from '../../src/common/constants/common'
+import { BLOGS } from '../../src/common/constants/routes'
+import { HttpStatus } from '../../src/common/types/http-statuses'
+import { BlogInput } from '../../src/features/blogs/types/blog'
 
 type GetAllParams = {
   app: Application
