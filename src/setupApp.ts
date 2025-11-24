@@ -1,6 +1,6 @@
 import express, { Application } from 'express'
 import { BLOGS, HOME, POSTS, TESTING } from './common/constants/routes'
-import { blogRouter } from './features/blogs/routers/blog.router'
+import { blogRouter } from './features/blogs/blog.router'
 import { postRouter } from './features/posts/routers/post.router'
 import { testingRouter } from './features/testing/routers/testing.router'
 
