@@ -1,12 +1,13 @@
 import { Messages } from '../../common/constants/messages'
 import { NotFoundError } from '../../common/types/errors.types'
-import { blogRepository } from './blog.repository'
-import { Blog, BlogInput } from './types/blog.types'
+import { blogQueryRepository } from './repository/blog-query.repository'
+import { blogRepository } from './repository/blog.repository'
+import { Blog, BlogInput, BlogQueryInput } from './types/blog.types'
 import { getBlogInputFields } from './utils/get-blog-input-fields.util'
 
 class BlogService {
-  public async getAll() {
-    return await blogRepository.getAll()
+  public async getAll(queryInput: BlogQueryInput) {
+    return await blogQueryRepository.findMany(queryInput)
   }
 
   public async getOne(id: string) {

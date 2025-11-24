@@ -1,7 +1,7 @@
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
-import { BlogInput, BlogViewModel } from '../../../src/features/blogs/types/blog.types'
+import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
 import { clearDb } from '../../utils/clearDb.util'
@@ -23,7 +23,7 @@ const incorrectTestBlogData: BlogInput = {
   websiteUrl: 'websiteUrl'
 }
 
-let createdBlog: BlogViewModel
+let createdBlog: BlogOutput
 
 describe('Blogs API', () => {
   const app = setupApp()
@@ -48,8 +48,8 @@ describe('Blogs API', () => {
     const blogsRes = await blogsTestManager.getAll({ app })
 
     expect(createdBlogRes.body.name).toBe(testBlogData.name)
-    expect(blogsRes.body).toBeInstanceOf(Array)
-    expect(blogsRes.body.length).toBe(1)
+    expect(blogsRes.body.items).toBeInstanceOf(Array)
+    expect(blogsRes.body.items.length).toBe(1)
 
     createdBlog = createdBlogRes.body
   })
@@ -84,8 +84,8 @@ describe('Blogs API', () => {
   it('Should get all blogs; GET /blogs', async () => {
     const getAllPostsRes = await blogsTestManager.getAll({ app })
 
-    expect(getAllPostsRes.body).toBeInstanceOf(Array)
-    expect(getAllPostsRes.body.length).toBe(1)
+    expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
+    expect(getAllPostsRes.body.items.length).toBe(1)
   })
 
   it('Should get one blog; GET /blogs/:id', async () => {
@@ -142,7 +142,7 @@ describe('Blogs API', () => {
     })
 
     const blogsResBefore = await blogsTestManager.getAll({ app })
-    expect(blogsResBefore.body.length).toBe(1)
+    expect(blogsResBefore.body.items.length).toBe(1)
 
     await blogsTestManager.deleteOne({
       app,
@@ -157,7 +157,7 @@ describe('Blogs API', () => {
     })
 
     const blogsResAfter = await blogsTestManager.getAll({ app })
-    expect(blogsResAfter.body.length).toBe(0)
+    expect(blogsResAfter.body.items.length).toBe(0)
   })
 
   it('Should not delete a not found blog; DELETE /blogs/:id', async () => {

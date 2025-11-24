@@ -1,3 +1,6 @@
+import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
+import { Meta } from '../../../common/types/query-result-output.types'
+
 export type BlogInput = {
   name: string
   description: string
@@ -9,6 +12,22 @@ export type Blog = BlogInput & {
   isMembership: boolean
 }
 
-export type BlogViewModel = Blog & {
+export type BlogOutput = Blog & {
   id: string
+}
+
+export enum BlogSortByFields {
+  CreatedAt = 'createdAt',
+  Name = 'name',
+}
+
+export type SearchQueryFields = Partial<{
+  searchNameTerm: string
+}>
+
+export type BlogQueryInput = PaginationAndSorting<BlogSortByFields> &
+  SearchQueryFields
+
+export type BlogsPaginatedOutput = Meta & {
+  items: BlogOutput[]
 }

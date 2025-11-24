@@ -69,3 +69,5 @@ export const blogsTestManager = {
   getAll,
   getOne
 }
+
+// Object.entries(obj).map(([key, val]) => `${key}=${val}`).join('&')

@@ -1,19 +1,34 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
   RequestWithBlogInput,
+  RequestWithBlogQuery,
   RequestWithId,
   RequestWithIdAndBlogInput,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
+import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
 import { blogService } from './blog.service'
-import { mapToBlogOutput } from './utils/blog-output.mapper'
+import { BlogSortByFields } from './types/blog.types'
+import {
+  mapToBlogOutput,
+  mapToBlogsPaginatedOutput,
+} from './utils/blog-output.mapper'
 
 class BlogController {
-  public getAll = catchAsync(async (req: Request, res: Response) => {
-    const blogs = await blogService.getAll()
-    res.status(HttpStatus.Ok).send(blogs.map(mapToBlogOutput))
-  })
+  public getAll = catchAsync(
+    async (req: RequestWithBlogQuery, res: Response) => {
+      const queryInput = setDefaultSortAndPagination<BlogSortByFields>(
+        req.query,
+      )
+
+      const { items, totalCount } = await blogService.getAll(queryInput)
+
+      res
+        .status(HttpStatus.Ok)
+        .send(mapToBlogsPaginatedOutput(items, totalCount, queryInput))
+    },
+  )
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
     const blog = await blogService.getOne(req.params.id)
