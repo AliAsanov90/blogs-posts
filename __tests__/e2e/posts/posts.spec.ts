@@ -1,10 +1,11 @@
 import request from 'supertest'
 import { AUTH_HEADER_NAME } from '../../../src/common/constants/common'
+import { Messages } from '../../../src/common/constants/messages'
 import { POSTS } from '../../../src/common/constants/routes'
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
-import { BlogInput } from '../../../src/features/blogs/types/blog.types'
+import { BlogInput, BlogViewModel } from '../../../src/features/blogs/types/blog.types'
 import { PostInput, PostViewModel } from '../../../src/features/posts/types/post.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
@@ -30,6 +31,7 @@ const incorrectTestPostData: PostInput = {
   blogId: 'blogId'
 }
 
+let createdBlog: BlogViewModel
 let createdPost: PostViewModel
 
 describe('Posts API', () => {
@@ -60,6 +62,7 @@ describe('Posts API', () => {
       .send(testPostData)
       .expect(HttpStatus.Created)
 
+    createdBlog = createdBlogRes.body
     createdPost = createdRes.body
   })
 
@@ -141,6 +144,26 @@ describe('Posts API', () => {
       .set(AUTH_HEADER_NAME, authToken)
       .send({ ...testPostData, title: 'Test title 3' })
       .expect(HttpStatus.NotFound)
+  })
+
+  it('Should not update a post if given blogId is different from post.blogId; UPDATE /posts/:id', async () => {
+    const differentBlogRes = await blogsTestManager.create({
+      app,
+      token: authToken,
+      data: testBlogData,
+    })
+
+    const res = await request(app)
+      .put(POSTS + `/${createdPost.id}`)
+      .set(AUTH_HEADER_NAME, authToken)
+      .send({
+        ...testPostData,
+        title: 'Test title 4',
+        blogId: differentBlogRes.body.id
+      })
+      .expect(HttpStatus.BadRequest)
+
+    expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
   })
 
   it('Should delete a post; DELETE /posts/:id', async () => {
