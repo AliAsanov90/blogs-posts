@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
-import { HttpStatus } from '../../common/types/http-statuses'
+import { HttpStatus } from '../../common/types/http-statuses.types'
+import {
+  RequestWithBlogInput,
+  RequestWithId,
+  RequestWithIdAndBlogInput,
+} from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
 import { blogService } from './blog.service'
-import {
-  RequestWithBody,
-  RequestWithParams,
-  RequestWithParamsAndBody,
-} from './types/request-response.types'
 import { mapToBlogOutput } from './utils/blog-output.mapper'
 
 class BlogController {
@@ -15,7 +15,7 @@ class BlogController {
     res.status(HttpStatus.Ok).send(blogs.map(mapToBlogOutput))
   })
 
-  public getOne = catchAsync(async (req: RequestWithParams, res: Response) => {
+  public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
     const blog = await blogService.getOne(req.params.id)
 
     return blog
@@ -23,13 +23,15 @@ class BlogController {
       : res.sendStatus(HttpStatus.NotFound)
   })
 
-  public create = catchAsync(async (req: RequestWithBody, res: Response) => {
-    const createdBlog = await blogService.create(req.body)
-    res.status(HttpStatus.Created).send(mapToBlogOutput(createdBlog))
-  })
+  public create = catchAsync(
+    async (req: RequestWithBlogInput, res: Response) => {
+      const createdBlog = await blogService.create(req.body)
+      res.status(HttpStatus.Created).send(mapToBlogOutput(createdBlog))
+    },
+  )
 
   public update = catchAsync(
-    async (req: RequestWithParamsAndBody, res: Response) => {
+    async (req: RequestWithIdAndBlogInput, res: Response) => {
       const isUpdated = await blogService.update(req.params.id, req.body)
 
       return isUpdated
@@ -38,7 +40,7 @@ class BlogController {
     },
   )
 
-  public delete = catchAsync(async (req: RequestWithParams, res: Response) => {
+  public delete = catchAsync(async (req: RequestWithId, res: Response) => {
     const isDeleted = await blogService.delete(req.params.id)
 
     return isDeleted

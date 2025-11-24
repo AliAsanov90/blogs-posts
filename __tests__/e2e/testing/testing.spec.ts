@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { BLOGS, POSTS, TESTING_ALL_DATA } from '../../../src/common/constants/routes'
-import { HttpStatus } from '../../../src/common/types/http-statuses'
+import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { setupApp } from '../../../src/setupApp'
 

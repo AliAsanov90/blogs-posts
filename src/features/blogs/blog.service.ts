@@ -1,4 +1,5 @@
-import { NotFoundError } from '../../common/errors/not-found.error'
+import { Messages } from '../../common/constants/messages'
+import { NotFoundError } from '../../common/types/errors.types'
 import { blogRepository } from './blog.repository'
 import { Blog, BlogInput } from './types/blog.types'
 import { getBlogInputFields } from './utils/get-blog-input-fields.util'
@@ -36,11 +37,11 @@ class BlogService {
     return await blogRepository.delete(id)
   }
 
-  private async getOrThrowExistingBlog(id: string) {
+  public async getOrThrowExistingBlog(id: string) {
     const blog = await blogRepository.getOne(id)
 
     if (!blog) {
-      throw new NotFoundError('Blog does not exist')
+      throw new NotFoundError(Messages.BlogNotFound)
     }
     return blog
   }

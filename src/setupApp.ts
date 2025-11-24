@@ -1,7 +1,7 @@
 import express, { Application } from 'express'
 import { BLOGS, HOME, POSTS, TESTING } from './common/constants/routes'
 import { blogRouter } from './features/blogs/blog.router'
-import { postRouter } from './features/posts/routers/post.router'
+import { postRouter } from './features/posts/post.router'
 import { testingRouter } from './features/testing/routers/testing.router'
 
 export const setupApp = (): Application => {
