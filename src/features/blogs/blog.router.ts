@@ -33,6 +33,7 @@ blogRouter
 
   .post(
     POSTS_BY_BLOG_ID,
+    authGuardMiddleware,
     blogIdValidation,
     postInputByBlogValidation,
     validationResultMiddleware,
