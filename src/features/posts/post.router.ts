@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { HOME, ID } from '../../common/constants/routes'
-import { authGuardMiddleware } from './../../common/middleware/auth.middleware'
-import { idValidation } from './../../common/middleware/id-validation.middleware'
-import { validationResultMiddleware } from './../../common/middleware/validation-result.middleware'
+import { authGuardMiddleware } from '../../common/middleware/auth.middleware'
+import { idValidation } from '../../common/middleware/id-validation.middleware'
+import { validationResultMiddleware } from '../../common/middleware/validation-result.middleware'
 import { postController } from './post.controller'
 import { postInputDtoValidation } from './utils/post-input.validation'
 

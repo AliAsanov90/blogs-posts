@@ -1,7 +1,7 @@
 import { Messages } from '../../common/constants/messages'
 import { BadRequestError, NotFoundError } from '../../common/types/errors.types'
 import { blogService } from '../blogs/blog.service'
-import { postRepository } from './post.repository'
+import { postRepository } from './repository/post.repository'
 import { Post, PostInput } from './types/post.types'
 import { getPostInputFields } from './utils/get-post-input-fields.util'
 
