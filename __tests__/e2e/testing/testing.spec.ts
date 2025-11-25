@@ -24,6 +24,6 @@ describe('Testing API', () => {
     const postsRes = await request(app).get(POSTS)
 
     expect(blogsRes.body.items).toHaveLength(0)
-    expect(postsRes.body).toHaveLength(0)
+    expect(postsRes.body.items).toHaveLength(0)
   })
 })

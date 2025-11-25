@@ -6,7 +6,7 @@ import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.types'
-import { PostInput, PostViewModel } from '../../../src/features/posts/types/post.types'
+import { PostInput, PostOutput } from '../../../src/features/posts/types/post.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
 import { clearDb } from '../../utils/clearDb.util'
@@ -32,7 +32,7 @@ const incorrectTestPostData: PostInput = {
 }
 
 let createdBlog: BlogOutput
-let createdPost: PostViewModel
+let createdPost: PostOutput
 
 describe('Posts API', () => {
   const app = setupApp()
@@ -112,8 +112,8 @@ describe('Posts API', () => {
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(getAllPostsRes.body).toBeInstanceOf(Array)
-    expect(getAllPostsRes.body.length).toBe(1)
+    expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
+    expect(getAllPostsRes.body.items.length).toBe(1)
   })
 
   it('Should get one post; GET /posts/:id', async () => {
@@ -171,7 +171,7 @@ describe('Posts API', () => {
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(postsResBefore.body.length).toBe(1)
+    expect(postsResBefore.body.items.length).toBe(1)
 
     await request(app)
       .get(POSTS + `/${createdPost.id}`)
@@ -190,7 +190,7 @@ describe('Posts API', () => {
       .get(POSTS)
       .expect(HttpStatus.Ok)
 
-    expect(postsResAfter.body.length).toBe(0)
+    expect(postsResAfter.body.items.length).toBe(0)
   })
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {
