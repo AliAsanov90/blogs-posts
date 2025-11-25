@@ -10,7 +10,12 @@ import {
 } from '../../features/posts/types/post.types'
 import { PaginationAndSorting } from '../middleware/query-validation.middleware'
 
+// COMMON types
+
 export type RequestWithId = Request<{ id: string }>
+export type RequestWithSanitizedQuery = Request & {
+  sanitizedQuery?: Record<string, unknown>
+}
 
 // POST types
 
@@ -27,7 +32,9 @@ export type RequestWithPostQuery = Request<
   unknown,
   unknown,
   PaginationAndSorting<PostSortByFields>
->
+> & {
+  sanitizedQuery: PaginationAndSorting<PostSortByFields>
+}
 
 // BLOG types
 
@@ -44,4 +51,15 @@ export type RequestWithBlogQuery = Request<
   unknown,
   unknown,
   PaginationAndSorting<BlogSortByFields> & SearchQueryFields
->
+> & {
+  sanitizedQuery: PaginationAndSorting<BlogSortByFields> & SearchQueryFields
+}
+
+export type RequestWithBlogIdAndPostQuery = Request<
+  { blogId: string },
+  unknown,
+  unknown,
+  PaginationAndSorting<PostSortByFields>
+> & {
+  sanitizedQuery: PaginationAndSorting<PostSortByFields>
+}

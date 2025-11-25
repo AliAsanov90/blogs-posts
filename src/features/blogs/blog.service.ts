@@ -1,5 +1,7 @@
 import { Messages } from '../../common/constants/messages'
 import { NotFoundError } from '../../common/types/errors.types'
+import { postQueryRepository } from '../posts/repository/post-query.repository'
+import { PostQueryInput } from '../posts/types/post.types'
 import { blogQueryRepository } from './repository/blog-query.repository'
 import { blogRepository } from './repository/blog.repository'
 import { Blog, BlogInput, BlogQueryInput } from './types/blog.types'
@@ -12,6 +14,10 @@ class BlogService {
 
   public async getOne(id: string) {
     return await blogRepository.getOne(id)
+  }
+
+  public async getPostsByBlogId(query: PostQueryInput, blogId: string) {
+    return await postQueryRepository.findManyByBlogId(query, blogId)
   }
 
   public async create(inputData: BlogInput) {

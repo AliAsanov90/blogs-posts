@@ -1,10 +1,10 @@
-import { Request, Response } from 'express'
-import { matchedData } from 'express-validator'
+import { Response } from 'express'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
   RequestWithId,
   RequestWithIdAndPostInput,
   RequestWithPostInput,
+  RequestWithPostQuery,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
 import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
@@ -16,18 +16,19 @@ import {
 } from './utils/post-output.mapper'
 
 class PostController {
-  public getAll = catchAsync(async (req: Request, res: Response) => {
-    const sanitizedQuery = matchedData(req, { locations: ['query'] })
+  public getAll = catchAsync(
+    async (req: RequestWithPostQuery, res: Response) => {
+      const queryInput = setDefaultSortAndPagination<PostSortByFields>(
+        req.sanitizedQuery,
+      )
 
-    const queryInput =
-      setDefaultSortAndPagination<PostSortByFields>(sanitizedQuery)
+      const { items, totalCount } = await postService.getAll(queryInput)
 
-    const { items, totalCount } = await postService.getAll(queryInput)
-
-    res
-      .status(HttpStatus.Ok)
-      .send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
-  })
+      res
+        .status(HttpStatus.Ok)
+        .send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
+    },
+  )
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
     const post = await postService.getOne(req.params.id)
