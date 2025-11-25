@@ -1,3 +1,6 @@
+import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
+import { Meta } from '../../../common/types/query-result-output.types'
+
 export type PostInput = {
   title: string
   shortDescription: string
@@ -10,11 +13,17 @@ export type Post = PostInput & {
   createdAt: Date
 }
 
-export type PostViewModel = Post & {
+export type PostOutput = Post & {
   id: string
 }
 
-export enum SortByPostFields {
+export enum PostSortByFields {
   CreatedAt = 'createdAt',
   Title = 'title',
+}
+
+export type PostQueryInput = PaginationAndSorting<PostSortByFields>
+
+export type PostsPaginatedOutput = Meta & {
+  items: PostOutput[]
 }

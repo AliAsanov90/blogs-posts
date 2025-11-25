@@ -1,6 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
-import { ValidationError, validationResult } from 'express-validator'
+import { NextFunction, Response } from 'express'
+import {
+  matchedData,
+  ValidationError,
+  validationResult,
+} from 'express-validator'
 import { HttpStatus } from '../types/http-statuses.types'
+import { RequestWithSanitizedQuery } from '../types/request-response.types'
 import { ValidationAppError } from '../types/validation-error.types'
 import { createErrorMessages } from '../utils/handle-errors.util'
 
@@ -10,7 +15,7 @@ const formatErrors = (e: ValidationError): ValidationAppError =>
     : { message: e.msg as string }
 
 export const validationResultMiddleware = (
-  req: Request,
+  req: RequestWithSanitizedQuery,
   res: Response,
   next: NextFunction,
 ) => {
@@ -21,6 +26,10 @@ export const validationResultMiddleware = (
   if (errors[0]) {
     return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors))
   }
+
+  req.sanitizedQuery = matchedData(req, {
+    locations: ['query'],
+  })
 
   next()
 }

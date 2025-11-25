@@ -1,10 +1,21 @@
 import { WithId } from 'mongodb'
-import { Post, PostViewModel } from '../types/post.types'
+import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
+import {
+  Post,
+  PostOutput,
+  PostSortByFields,
+  PostsPaginatedOutput,
+} from '../types/post.types'
 
-export function mapToPostOutput(post: WithId<Post>): PostViewModel {
-  const { _id, title, shortDescription, content, blogId, blogName, createdAt } =
-    post
-
+export function mapToPostOutput({
+  _id,
+  title,
+  shortDescription,
+  content,
+  blogId,
+  blogName,
+  createdAt,
+}: WithId<Post>): PostOutput {
   return {
     id: _id.toString(),
     title,
@@ -13,5 +24,19 @@ export function mapToPostOutput(post: WithId<Post>): PostViewModel {
     blogId,
     blogName,
     createdAt,
+  }
+}
+
+export const mapToPostsPaginatedOutput = (
+  items: WithId<Post>[],
+  totalCount: number,
+  { pageNumber, pageSize }: PaginationAndSorting<PostSortByFields>,
+): PostsPaginatedOutput => {
+  return {
+    pagesCount: Math.ceil(totalCount / pageSize),
+    page: pageNumber,
+    pageSize,
+    totalCount,
+    items: items.map(mapToPostOutput),
   }
 }

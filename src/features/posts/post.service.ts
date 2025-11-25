@@ -1,13 +1,14 @@
 import { Messages } from '../../common/constants/messages'
 import { BadRequestError, NotFoundError } from '../../common/types/errors.types'
 import { blogService } from '../blogs/blog.service'
-import { postRepository } from './post.repository'
-import { Post, PostInput } from './types/post.types'
+import { postQueryRepository } from './repository/post-query.repository'
+import { postRepository } from './repository/post.repository'
+import { Post, PostInput, PostQueryInput } from './types/post.types'
 import { getPostInputFields } from './utils/get-post-input-fields.util'
 
 class PostService {
-  public async getAll() {
-    return await postRepository.getAll()
+  public async getAll(queryInput: PostQueryInput) {
+    return await postQueryRepository.findMany(queryInput)
   }
 
   public async getOne(id: string) {

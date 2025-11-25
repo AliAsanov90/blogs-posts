@@ -1,7 +1,7 @@
 import { Filter } from 'mongodb'
 import { QueryResult } from '../../../common/types/query-result-output.types'
 import { blogsCollection } from '../../../db/mongo.db'
-import { Blog, BlogQueryInput, SearchQueryFields } from '../types/blog.types'
+import { Blog, BlogQueryInput } from '../types/blog.types'
 
 class BlogQueryRepository {
   public async findMany(
@@ -11,7 +11,7 @@ class BlogQueryRepository {
       queryInput
 
     const skip = (pageNumber - 1) * pageSize
-    const filter: Filter<SearchQueryFields> = {}
+    const filter: Filter<Blog> = {}
 
     if (searchNameTerm) {
       filter.name = { $regex: searchNameTerm, $options: 'i' }
@@ -24,7 +24,9 @@ class BlogQueryRepository {
       .limit(pageSize)
       .toArray()
 
-    return { items, totalCount: items.length }
+    const totalCount = await blogsCollection.countDocuments(filter)
+
+    return { items, totalCount }
   }
 }
 
