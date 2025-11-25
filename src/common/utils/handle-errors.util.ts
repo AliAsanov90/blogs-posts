@@ -36,5 +36,6 @@ export const handleErrors = <K extends Response>(error: unknown, res: K) => {
   res.status(HttpStatus.InternalServerError).json({
     message: 'Something went wrong...',
     status: HttpStatus.InternalServerError,
+    error,
   })
 }

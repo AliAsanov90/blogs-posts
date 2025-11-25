@@ -24,7 +24,9 @@ class BlogQueryRepository {
       .limit(pageSize)
       .toArray()
 
-    return { items, totalCount: items.length }
+    const totalCount = await blogsCollection.countDocuments(filter)
+
+    return { items, totalCount }
   }
 }
 

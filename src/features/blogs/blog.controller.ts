@@ -1,8 +1,8 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
+import { matchedData } from 'express-validator'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
   RequestWithBlogInput,
-  RequestWithBlogQuery,
   RequestWithId,
   RequestWithIdAndBlogInput,
 } from '../../common/types/request-response.types'
@@ -16,19 +16,20 @@ import {
 } from './utils/blog-output.mapper'
 
 class BlogController {
-  public getAll = catchAsync(
-    async (req: RequestWithBlogQuery, res: Response) => {
-      const queryInput = setDefaultSortAndPagination<BlogSortByFields>(
-        req.query,
-      )
+  public getAll = catchAsync(async (req: Request, res: Response) => {
+    const sanitizedQuery = matchedData(req, {
+      locations: ['query'],
+    })
 
-      const { items, totalCount } = await blogService.getAll(queryInput)
+    const queryInput =
+      setDefaultSortAndPagination<BlogSortByFields>(sanitizedQuery)
 
-      res
-        .status(HttpStatus.Ok)
-        .send(mapToBlogsPaginatedOutput(items, totalCount, queryInput))
-    },
-  )
+    const { items, totalCount } = await blogService.getAll(queryInput)
+
+    res
+      .status(HttpStatus.Ok)
+      .send(mapToBlogsPaginatedOutput(items, totalCount, queryInput))
+  })
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
     const blog = await blogService.getOne(req.params.id)
