@@ -20,6 +20,7 @@ export type PostOutput = Post & {
 export enum PostSortByFields {
   CreatedAt = 'createdAt',
   Title = 'title',
+  BlogName = 'blogName',
 }
 
 export type PostQueryInput = PaginationAndSorting<PostSortByFields>
