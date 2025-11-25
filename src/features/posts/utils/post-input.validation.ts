@@ -50,3 +50,9 @@ export const postInputDtoValidation = [
   contentValidation,
   blogIdValidation,
 ]
+
+export const postInputByBlogValidation = [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
+]

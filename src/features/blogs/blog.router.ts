@@ -5,6 +5,7 @@ import { idValidation } from '../../common/middleware/id-validation.middleware'
 import { getQueryValidation } from '../../common/middleware/query-validation.middleware'
 import { validationResultMiddleware } from '../../common/middleware/validation-result.middleware'
 import { PostSortByFields } from '../posts/types/post.types'
+import { postInputByBlogValidation } from '../posts/utils/post-input.validation'
 import { blogController } from './blog.controller'
 import { BlogSortByFields } from './types/blog.types'
 import { blogIdValidation } from './utils/blog-id.validation'
@@ -28,6 +29,14 @@ blogRouter
     getQueryValidation(PostSortByFields),
     validationResultMiddleware,
     blogController.getPostsByBlogId,
+  )
+
+  .post(
+    POSTS_BY_BLOG_ID,
+    blogIdValidation,
+    postInputByBlogValidation,
+    validationResultMiddleware,
+    blogController.createPostByBlogId,
   )
 
   .post(

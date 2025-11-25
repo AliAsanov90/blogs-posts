@@ -1,6 +1,7 @@
 import { Response } from 'express'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
+  RequestWithBlogIdAndPostInput,
   RequestWithBlogIdAndPostQuery,
   RequestWithBlogInput,
   RequestWithBlogQuery,
@@ -9,8 +10,11 @@ import {
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
 import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
-import { PostSortByFields } from '../posts/types/post.types'
-import { mapToPostsPaginatedOutput } from '../posts/utils/post-output.mapper'
+import { PostInput, PostSortByFields } from '../posts/types/post.types'
+import {
+  mapToPostOutput,
+  mapToPostsPaginatedOutput,
+} from '../posts/utils/post-output.mapper'
 import { blogService } from './blog.service'
 import { BlogSortByFields } from './types/blog.types'
 import {
@@ -55,6 +59,15 @@ class BlogController {
       res
         .status(HttpStatus.Ok)
         .send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
+    },
+  )
+
+  public createPostByBlogId = catchAsync(
+    async (req: RequestWithBlogIdAndPostInput, res: Response) => {
+      const inputData: PostInput = { ...req.body, blogId: req.params.blogId }
+
+      const createdPost = await blogService.createPostByBlogId(inputData)
+      res.status(HttpStatus.Created).send(mapToPostOutput(createdPost))
     },
   )
 

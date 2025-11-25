@@ -63,3 +63,9 @@ export type RequestWithBlogIdAndPostQuery = Request<
 > & {
   sanitizedQuery: PaginationAndSorting<PostSortByFields>
 }
+
+export type RequestWithBlogIdAndPostInput = Request<
+  { blogId: string },
+  unknown,
+  Omit<PostInput, 'blogId'>
+>
