@@ -1,12 +1,12 @@
 import { Request } from 'express'
 import {
-  BlogInput,
-  BlogSortByFields,
-  SearchQueryFields,
+    BlogInput,
+    BlogSortByFields,
+    SearchQueryFields,
 } from '../../features/blogs/types/blog.types'
 import {
-  PostInput,
-  SortByPostFields,
+    PostInput,
+    PostSortByFields,
 } from '../../features/posts/types/post.types'
 import { PaginationAndSorting } from '../middleware/query-validation.middleware'
 
@@ -26,7 +26,7 @@ export type RequestWithPostQuery = Request<
   unknown,
   unknown,
   unknown,
-  PaginationAndSorting<SortByPostFields>
+  PaginationAndSorting<PostSortByFields>
 >
 
 // BLOG types

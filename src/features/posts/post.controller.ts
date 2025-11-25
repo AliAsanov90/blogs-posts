@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { matchedData } from 'express-validator'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
   RequestWithId,
@@ -6,13 +7,26 @@ import {
   RequestWithPostInput,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
+import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
 import { postService } from './post.service'
-import { mapToPostOutput } from './utils/post-output.mapper'
+import { PostSortByFields } from './types/post.types'
+import {
+  mapToPostOutput,
+  mapToPostsPaginatedOutput,
+} from './utils/post-output.mapper'
 
 class PostController {
   public getAll = catchAsync(async (req: Request, res: Response) => {
-    const posts = await postService.getAll()
-    res.status(HttpStatus.Ok).send(posts.map(mapToPostOutput))
+    const sanitizedQuery = matchedData(req, { locations: ['query'] })
+
+    const queryInput =
+      setDefaultSortAndPagination<PostSortByFields>(sanitizedQuery)
+
+    const { items, totalCount } = await postService.getAll(queryInput)
+
+    res
+      .status(HttpStatus.Ok)
+      .send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
   })
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
