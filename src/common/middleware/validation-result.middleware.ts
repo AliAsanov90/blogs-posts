@@ -29,6 +29,7 @@ export const validationResultMiddleware = (
 
   req.sanitizedQuery = matchedData(req, {
     locations: ['query'],
+    includeOptionals: true,
   })
 
   next()

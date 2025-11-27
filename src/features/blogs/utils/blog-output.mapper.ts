@@ -1,11 +1,7 @@
 import { WithId } from 'mongodb'
 import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
-import {
-  Blog,
-  BlogOutput,
-  BlogSortByFields,
-  BlogsPaginatedOutput,
-} from '../types/blog.types'
+import { PaginatedOutput } from '../../../common/types/query-result-output.types'
+import { Blog, BlogOutput, BlogSortByFields } from '../types/blog.types'
 
 export function mapToBlogOutput({
   _id,
@@ -29,7 +25,7 @@ export const mapToBlogsPaginatedOutput = (
   items: WithId<Blog>[],
   totalCount: number,
   { pageNumber, pageSize }: PaginationAndSorting<BlogSortByFields>,
-): BlogsPaginatedOutput => {
+): PaginatedOutput<BlogOutput> => {
   return {
     pagesCount: Math.ceil(totalCount / pageSize),
     page: pageNumber,

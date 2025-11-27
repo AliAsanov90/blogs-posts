@@ -1,5 +1,4 @@
 import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
-import { Meta } from '../../../common/types/query-result-output.types'
 
 export type BlogInput = {
   name: string
@@ -27,7 +26,3 @@ export type SearchQueryFields = Partial<{
 
 export type BlogQueryInput = PaginationAndSorting<BlogSortByFields> &
   SearchQueryFields
-
-export type BlogsPaginatedOutput = Meta & {
-  items: BlogOutput[]
-}

@@ -8,3 +8,7 @@ export type Meta = {
   pageSize: number
   totalCount: number
 }
+
+export type PaginatedOutput<T> = Meta & {
+  items: T[]
+}

@@ -1,7 +1,4 @@
-import request from 'supertest'
-import { AUTH_HEADER_NAME } from '../../../src/common/constants/common'
 import { Messages } from '../../../src/common/constants/messages'
-import { POSTS } from '../../../src/common/constants/routes'
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
@@ -10,6 +7,7 @@ import { PostInput, PostOutput } from '../../../src/features/posts/types/post.ty
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
 import { clearDb } from '../../utils/clearDb.util'
+import { postsTestManager } from '../../utils/posts.util'
 
 const testBlogData: BlogInput = {
   name: 'Test name',
@@ -56,94 +54,100 @@ describe('Posts API', () => {
 
     testPostData.blogId = createdBlogRes.body.id
 
-    const createdRes = await request(app)
-      .post(POSTS)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send(testPostData)
-      .expect(HttpStatus.Created)
+    const createdRes = await postsTestManager.create({
+      app,
+      token: authToken,
+      data: testPostData
+    })
 
     createdBlog = createdBlogRes.body
     createdPost = createdRes.body
   })
 
   it('Should not create a post if blog does not exist; POST /posts', async () => {
-    await request(app)
-      .post(POSTS)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send({ ...testPostData, blogId: '691fe02e62d2354296c74851' })
-      .expect(HttpStatus.NotFound)
+    await postsTestManager.create({
+      app,
+      token: authToken,
+      data: { ...testPostData, blogId: '691fe02e62d2354296c74851' },
+      httpStatus: HttpStatus.NotFound
+    })
   })
 
   it('Should not create a post if blogId is not passed in req.body; POST /posts', async () => {
     const { blogId, ...restTestPostData } = testPostData
 
-    await request(app)
-      .post(POSTS)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send(restTestPostData)
-      .expect(HttpStatus.BadRequest)
+    await postsTestManager.create({
+      app,
+      token: authToken,
+      data: restTestPostData,
+      httpStatus: HttpStatus.BadRequest
+    })
   })
 
   it('Should not create a post without auth header; POST /posts', async () => {
-    await request(app)
-      .post(POSTS)
-      .send(testPostData)
-      .expect(HttpStatus.Unauthorized)
+    await postsTestManager.create({
+      app,
+      data: testPostData,
+      httpStatus: HttpStatus.Unauthorized
+    })
   })
 
   it('Should not create a post with incorrect auth token; POST /posts', async () => {
-    await request(app)
-      .post(POSTS)
-      .set(AUTH_HEADER_NAME, 'Basic sfsdfsdsdfsdsf')
-      .send(testPostData)
-      .expect(HttpStatus.Unauthorized)
+    await postsTestManager.create({
+      app,
+      token: 'Basic sfsdfsdsdfsdsf',
+      data: testPostData,
+      httpStatus: HttpStatus.Unauthorized
+    })
   })
 
   it('Should not create a post if body is incorrect; POST /posts', async () => {
-    await request(app)
-      .post(POSTS)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send(incorrectTestPostData)
-      .expect(HttpStatus.BadRequest)
+    await postsTestManager.create({
+      app,
+      token: authToken,
+      data: incorrectTestPostData,
+      httpStatus: HttpStatus.BadRequest
+    })
   })
 
   it('Should get all posts; GET /posts', async () => {
-    const getAllPostsRes = await request(app)
-      .get(POSTS)
-      .expect(HttpStatus.Ok)
+    const getAllPostsRes = await postsTestManager.getAll({ app })
 
     expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
     expect(getAllPostsRes.body.items.length).toBe(1)
   })
 
   it('Should get one post; GET /posts/:id', async () => {
-    const getCreatedPostRes = await request(app)
-      .get(POSTS + `/${createdPost.id}`)
-      .expect(HttpStatus.Ok)
-
+    const getCreatedPostRes = await postsTestManager.getOne({
+      app,
+      id: createdPost.id
+    })
     expect(getCreatedPostRes.body.id).toBe(createdPost.id)
   })
 
   it('Should update a post; PUT /posts/:id', async () => {
-    await request(app)
-      .put(`${POSTS}/${createdPost.id}`)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send({ ...testPostData, title: 'Test title 2' })
-      .expect(HttpStatus.NoContent)
+    await postsTestManager.update({
+      app,
+      id: createdPost.id,
+      token: authToken,
+      data: { ...testPostData, title: 'Test title 2' },
+    })
 
-    const updatedPostRes = await request(app)
-      .get(POSTS + `/${createdPost.id}`)
-      .expect(HttpStatus.Ok)
-
+    const updatedPostRes = await postsTestManager.getOne({
+      app,
+      id: createdPost.id
+    })
     expect(updatedPostRes.body.title).toBe('Test title 2')
   })
 
   it('Should not update a not found post; UPDATE /posts/:id', async () => {
-    await request(app)
-      .put(POSTS + '/691fe02e62d2354296c74851')
-      .set(AUTH_HEADER_NAME, authToken)
-      .send({ ...testPostData, title: 'Test title 3' })
-      .expect(HttpStatus.NotFound)
+    await postsTestManager.update({
+      app,
+      id: '691fe02e62d2354296c74851',
+      token: authToken,
+      data: { ...testPostData, title: 'Test title 3' },
+      httpStatus: HttpStatus.NotFound
+    })
   })
 
   it('Should not update a post if given blogId is different from post.blogId; UPDATE /posts/:id', async () => {
@@ -153,50 +157,51 @@ describe('Posts API', () => {
       data: testBlogData,
     })
 
-    const res = await request(app)
-      .put(POSTS + `/${createdPost.id}`)
-      .set(AUTH_HEADER_NAME, authToken)
-      .send({
+    const res = await postsTestManager.update({
+      app,
+      id: createdPost.id,
+      token: authToken,
+      data: {
         ...testPostData,
         title: 'Test title 4',
         blogId: differentBlogRes.body.id
-      })
-      .expect(HttpStatus.BadRequest)
-
+      },
+      httpStatus: HttpStatus.BadRequest
+    })
     expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
   })
 
   it('Should delete a post; DELETE /posts/:id', async () => {
-    const postsResBefore = await request(app)
-      .get(POSTS)
-      .expect(HttpStatus.Ok)
-
+    const postsResBefore = await postsTestManager.getAll({ app })
     expect(postsResBefore.body.items.length).toBe(1)
 
-    await request(app)
-      .get(POSTS + `/${createdPost.id}`)
-      .expect(HttpStatus.Ok)
+    await postsTestManager.getOne({
+      app,
+      id: createdPost.id,
+    })
 
-    await request(app)
-      .delete(POSTS + `/${createdPost.id}`)
-      .set(AUTH_HEADER_NAME, authToken)
-      .expect(HttpStatus.NoContent)
+    await postsTestManager.delete({
+      app,
+      id: createdPost.id,
+      token: authToken
+    })
 
-    await request(app)
-      .get(POSTS + `/${createdPost.id}`)
-      .expect(HttpStatus.NotFound)
+    await postsTestManager.getOne({
+      app,
+      id: createdPost.id,
+      httpStatus: HttpStatus.NotFound
+    })
 
-    const postsResAfter = await request(app)
-      .get(POSTS)
-      .expect(HttpStatus.Ok)
-
+    const postsResAfter = await postsTestManager.getAll({ app })
     expect(postsResAfter.body.items.length).toBe(0)
   })
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {
-    await request(app)
-      .delete(POSTS + '/691fe02e62d2354296c74851')
-      .set(AUTH_HEADER_NAME, authToken)
-      .expect(HttpStatus.NotFound)
+    await postsTestManager.delete({
+      app,
+      id: '691fe02e62d2354296c74851',
+      token: authToken,
+      httpStatus: HttpStatus.NotFound
+    })
   })
 })
