@@ -1,5 +1,4 @@
 import { PaginationAndSorting } from '../../../common/middleware/query-validation.middleware'
-import { Meta } from '../../../common/types/query-result-output.types'
 
 export type PostInput = {
   title: string
@@ -24,7 +23,3 @@ export enum PostSortByFields {
 }
 
 export type PostQueryInput = PaginationAndSorting<PostSortByFields>
-
-export type PostsPaginatedOutput = Meta & {
-  items: PostOutput[]
-}
