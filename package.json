@@ -9,7 +9,7 @@
   "packageManager": "pnpm@10.20.0",
   "scripts": {
     "ts:watch": "tsc -w",
-    "dev": "nodemon --inspect dist/index.js",
+    "dev": "nodemon --inspect ./dist/index.js",
     "dev:watch": "concurrently 'pnpm ts:watch' 'pnpm dev'",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "lint:fix": "eslint 'src/**/*.{ts,js}' --fix",
