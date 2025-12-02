@@ -1,5 +1,9 @@
 import { Response } from 'express'
-import { BadRequestError, NotFoundError } from '../types/errors.types'
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../types/errors.types'
 import { HttpStatus } from '../types/http-statuses.types'
 import {
   ErrorMessages,
@@ -31,6 +35,10 @@ export const handleErrors = <K extends Response>(error: unknown, res: K) => {
 
   if (error instanceof BadRequestError) {
     return getErrorResponseObj(error, BadRequestError.httpStatus, res)
+  }
+
+  if (error instanceof UnauthorizedError) {
+    return getErrorResponseObj(error, UnauthorizedError.httpStatus, res)
   }
 
   res.status(HttpStatus.InternalServerError).json({
