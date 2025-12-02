@@ -1,4 +1,8 @@
-import { query } from 'express-validator'
+import { query, ValidationChain } from 'express-validator'
+import {
+  SearchQueryFields,
+  TSearchQueryFieldKeys,
+} from '../types/request-response.types'
 
 export enum SortDirection {
   Asc = 'asc',
@@ -26,6 +30,7 @@ export const defaultSortPaginationValues: PaginationAndSorting<string> = {
 
 export const getQueryValidation = <T extends string>(
   sortFieldsEnum: Record<string, T>,
+  searchFieldsEnum?: Partial<typeof SearchQueryFields>,
 ) => {
   const defaultSortBy = Object.values(sortFieldsEnum)[0]
   const allowedSortByFields = Object.values(sortFieldsEnum)
@@ -40,6 +45,26 @@ export const getQueryValidation = <T extends string>(
     .withMessage('Search name term must not be empty')
     .isLength({ max: 100 })
     .withMessage('Search name term must be maximum 100 characters')
+
+  const searchLoginTermValidation = query('searchLoginTerm')
+    .optional()
+    .isString()
+    .withMessage('Search login term must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('Search login term must not be empty')
+    .isLength({ max: 20 })
+    .withMessage('Search login term must be maximum 20 characters')
+
+  const searchEmailTermValidation = query('searchEmailTerm')
+    .optional()
+    .isString()
+    .withMessage('Search email term must be a string')
+    .trim()
+    .notEmpty()
+    .withMessage('Search email term must not be empty')
+    .isLength({ max: 50 })
+    .withMessage('Search email term must be maximum 50 characters')
 
   const sortByValidation = query('sortBy')
     .default(defaultSortBy)
@@ -67,11 +92,29 @@ export const getQueryValidation = <T extends string>(
     .withMessage('Page size must be between 1 and 100')
     .toInt()
 
-  return [
-    searchNameTermValidation,
+  const validations = [
     sortByValidation,
     sortDirectionValidation,
     pageNumberValidation,
     pageSizeValidation,
   ]
+
+  if (!searchFieldsEnum) return validations
+
+  const searchFieldValidations: Record<TSearchQueryFieldKeys, ValidationChain> =
+    {
+      [SearchQueryFields.searchNameTerm]: searchNameTermValidation,
+      [SearchQueryFields.searchLoginTerm]: searchLoginTermValidation,
+      [SearchQueryFields.searchEmailTerm]: searchEmailTermValidation,
+    }
+
+  Object.keys(SearchQueryFields).forEach((searchField) => {
+    if (searchField in searchFieldsEnum) {
+      validations.push(
+        searchFieldValidations[searchField as TSearchQueryFieldKeys],
+      )
+    }
+  })
+
+  return validations
 }

@@ -20,9 +20,9 @@ export enum BlogSortByFields {
   Name = 'name',
 }
 
-export type SearchQueryFields = Partial<{
-  searchNameTerm: string
-}>
+export enum BlogSearchQueryFields {
+  searchNameTerm = 'searchNameTerm',
+}
 
 export type BlogQueryInput = PaginationAndSorting<BlogSortByFields> &
-  SearchQueryFields
+  typeof BlogSearchQueryFields

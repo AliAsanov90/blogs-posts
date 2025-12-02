@@ -7,9 +7,9 @@ class PostRepository {
     return postsCollection.findOne({ _id: new ObjectId(id) })
   }
 
-  public async create(post: Post): Promise<WithId<Post>> {
+  public async create(post: Post): Promise<ObjectId> {
     const { insertedId } = await postsCollection.insertOne(post)
-    return { ...post, _id: insertedId }
+    return insertedId
   }
 
   public async update(id: string, post: Post): Promise<boolean> {

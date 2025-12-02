@@ -1,4 +1,4 @@
-import { Filter } from 'mongodb'
+import { Filter, ObjectId, WithId } from 'mongodb'
 import { QueryResult } from '../../../common/types/query-result-output.types'
 import { postsCollection } from '../../../db/mongo.db'
 import { Post, PostQueryInput } from '../types/post.types'
@@ -34,6 +34,10 @@ class PostQueryRepository {
     blogId: string,
   ): Promise<QueryResult<Post>> {
     return await this.findMany(query, blogId)
+  }
+
+  public async findById(id: ObjectId): Promise<WithId<Post> | null> {
+    return postsCollection.findOne({ _id: id })
   }
 }
 

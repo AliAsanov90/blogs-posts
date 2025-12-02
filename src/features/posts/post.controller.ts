@@ -1,15 +1,16 @@
 import { Response } from 'express'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
+  RequestWithBody,
   RequestWithId,
-  RequestWithIdAndPostInput,
-  RequestWithPostInput,
-  RequestWithPostQuery,
+  RequestWithIdAndBody,
+  RequestWithQuery,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
 import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
 import { postService } from './post.service'
-import { PostSortByFields } from './types/post.types'
+import { postQueryRepository } from './repository/post-query.repository'
+import { PostInput, PostQueryInput, PostSortByFields } from './types/post.types'
 import {
   mapToPostOutput,
   mapToPostsPaginatedOutput,
@@ -17,8 +18,8 @@ import {
 
 class PostController {
   public getAll = catchAsync(
-    async (req: RequestWithPostQuery, res: Response) => {
-      const queryInput = setDefaultSortAndPagination<PostSortByFields>(
+    async (req: RequestWithQuery<PostSortByFields>, res: Response) => {
+      const queryInput = setDefaultSortAndPagination<PostQueryInput>(
         req.sanitizedQuery,
       )
 
@@ -39,14 +40,16 @@ class PostController {
   })
 
   public create = catchAsync(
-    async (req: RequestWithPostInput, res: Response) => {
-      const createdPost = await postService.create(req.body)
-      res.status(HttpStatus.Created).send(mapToPostOutput(createdPost))
+    async (req: RequestWithBody<PostInput>, res: Response) => {
+      const createdPostId = await postService.create(req.body)
+      const post = await postQueryRepository.findById(createdPostId)
+
+      res.status(HttpStatus.Created).send(mapToPostOutput(post!))
     },
   )
 
   public update = catchAsync(
-    async (req: RequestWithIdAndPostInput, res: Response) => {
+    async (req: RequestWithIdAndBody<PostInput>, res: Response) => {
       const isUpdated = await postService.update(req.params.id, req.body)
 
       return isUpdated
