@@ -6,9 +6,16 @@ export const TESTING = '/testing'
 export const ALL_DATA = '/all-data'
 export const TESTING_ALL_DATA = `${TESTING}${ALL_DATA}`
 
-// BLOG routes
+// BLOGS routes
 export const BLOGS = '/blogs'
 export const POSTS_BY_BLOG_ID = '/:blogId/posts'
 
-// POST routes
+// POSTS routes
 export const POSTS = '/posts'
+
+// USERS routes
+export const USERS = '/users'
+
+// AUTH routes
+export const AUTH = '/auth'
+export const LOGIN = '/login'

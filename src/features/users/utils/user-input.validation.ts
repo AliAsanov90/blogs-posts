@@ -1,0 +1,44 @@
+import { body } from 'express-validator'
+
+const loginValidation = body('login')
+  .exists()
+  .withMessage('login field should exist')
+  .isString()
+  .withMessage('login field should be a string')
+  .trim()
+  .notEmpty()
+  .withMessage('login field should not be empty')
+  .isLength({ min: 3, max: 10 })
+  .withMessage('login field should be from 3 to 10 characters long')
+  .matches('^[a-zA-Z0-9_-]*$')
+  .withMessage('login does not match specific pattern')
+
+const passwordValidation = body('password')
+  .exists()
+  .withMessage('password field should exist')
+  .isString()
+  .withMessage('password field should be a string')
+  .trim()
+  .notEmpty()
+  .withMessage('password field should not be empty')
+  .isLength({ min: 6, max: 20 })
+  .withMessage('password field should be from 6 to 20 characters long')
+
+const emailValidation = body('email')
+  .exists()
+  .withMessage('email field should exist')
+  .isString()
+  .withMessage('email field should be a string')
+  .trim()
+  .notEmpty()
+  .withMessage('email field should not be empty')
+  .isEmail()
+  .withMessage('email field should be a valid email')
+  .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+  .withMessage('email does not match specific pattern')
+
+export const userInputValidation = [
+  loginValidation,
+  passwordValidation,
+  emailValidation,
+]

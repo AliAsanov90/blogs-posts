@@ -7,7 +7,7 @@ import { validationResultMiddleware } from '../../common/middleware/validation-r
 import { PostSortByFields } from '../posts/types/post.types'
 import { postInputByBlogValidation } from '../posts/utils/post-input.validation'
 import { blogController } from './blog.controller'
-import { BlogSortByFields } from './types/blog.types'
+import { BlogSearchQueryFields, BlogSortByFields } from './types/blog.types'
 import { blogIdValidation } from './utils/blog-id.validation'
 import { blogInputValidation } from './utils/blog-input.validation'
 
@@ -16,7 +16,7 @@ export const blogRouter: Router = Router()
 blogRouter
   .get(
     HOME,
-    getQueryValidation(BlogSortByFields),
+    getQueryValidation(BlogSortByFields, BlogSearchQueryFields),
     validationResultMiddleware,
     blogController.getAll,
   )

@@ -1,4 +1,4 @@
-import { Filter } from 'mongodb'
+import { Filter, ObjectId, WithId } from 'mongodb'
 import { QueryResult } from '../../../common/types/query-result-output.types'
 import { blogsCollection } from '../../../db/mongo.db'
 import { Blog, BlogQueryInput } from '../types/blog.types'
@@ -27,6 +27,10 @@ class BlogQueryRepository {
     const totalCount = await blogsCollection.countDocuments(filter)
 
     return { items, totalCount }
+  }
+
+  public async findById(id: ObjectId): Promise<WithId<Blog> | null> {
+    return blogsCollection.findOne({ _id: id })
   }
 }
 
