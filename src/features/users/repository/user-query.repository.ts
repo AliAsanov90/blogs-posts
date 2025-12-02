@@ -28,7 +28,7 @@ class UserQueryRepository {
     })
 
     const items = await usersCollection
-      .find()
+      .find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
