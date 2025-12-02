@@ -7,9 +7,9 @@ class BlogRepository {
     return blogsCollection.findOne({ _id: new ObjectId(id) })
   }
 
-  public async create(blog: Blog): Promise<ObjectId> {
+  public async create(blog: Blog): Promise<string> {
     const { insertedId } = await blogsCollection.insertOne(blog)
-    return insertedId
+    return insertedId.toString()
   }
 
   public async update(id: string, blog: Blog): Promise<boolean> {

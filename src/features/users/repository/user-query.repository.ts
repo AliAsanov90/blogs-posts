@@ -39,26 +39,29 @@ class UserQueryRepository {
     return { items, totalCount }
   }
 
-  public async findById(id: ObjectId): Promise<WithId<User> | null> {
-    return usersCollection.findOne({ _id: id })
+  public async findById(id: string): Promise<WithId<User> | null> {
+    return usersCollection.findOne({ _id: new ObjectId(id) })
   }
 
   private prepareFilterObj(
     fieldValuesMap: Record<UserSearchFieldKeys, UserSearchQueryFields>,
   ) {
-    return Object.entries(fieldValuesMap).reduce(
-      (filterObj, [field, value]): Filter<User> => {
-        filterObj.$or = filterObj.$or?.length ? filterObj.$or : []
+    const filterObj: Filter<User> = {}
+    const orArray: Filter<User>[] = []
 
-        if (value) {
-          filterObj.$or.push({
-            [field]: { $regex: value, $options: 'i' },
-          })
-        }
-        return filterObj
-      },
-      {},
-    )
+    Object.entries(fieldValuesMap).forEach(([field, value]) => {
+      if (value) {
+        orArray.push({
+          [field]: { $regex: value, $options: 'i' },
+        })
+      }
+    })
+
+    if (orArray.length) {
+      filterObj.$or = orArray
+    }
+
+    return filterObj
   }
 }
 

@@ -18,9 +18,9 @@ class UserRepository {
     return usersCollection.findOne({ _id: new ObjectId(id) })
   }
 
-  public async create(user: User): Promise<ObjectId> {
+  public async create(user: User): Promise<string> {
     const { insertedId } = await usersCollection.insertOne(user)
-    return insertedId
+    return insertedId.toString()
   }
 
   public async delete(id: string): Promise<boolean> {
