@@ -26,5 +26,7 @@ export enum UserSearchQueryFields {
   searchEmailTerm = 'searchEmailTerm',
 }
 
-export type UserQueryInput = PaginationAndSorting<UserSortByFields> &
-  typeof UserSearchQueryFields
+export type UserQueryInput = PaginationAndSorting<UserSortByFields> & {
+  searchLoginTerm?: string
+  searchEmailTerm?: string
+}

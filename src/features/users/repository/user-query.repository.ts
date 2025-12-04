@@ -1,11 +1,7 @@
 import { Filter, ObjectId, WithId } from 'mongodb'
 import { QueryResult } from '../../../common/types/query-result-output.types'
 import { usersCollection } from '../../../db/mongo.db'
-import {
-  User,
-  UserQueryInput,
-  UserSearchQueryFields,
-} from '../types/user.types'
+import { User, UserQueryInput } from '../types/user.types'
 
 type UserSearchFieldKeys = keyof Pick<User, 'login' | 'email'>
 
@@ -44,7 +40,7 @@ class UserQueryRepository {
   }
 
   private prepareFilterObj(
-    fieldValuesMap: Record<UserSearchFieldKeys, UserSearchQueryFields>,
+    fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>,
   ) {
     const filterObj: Filter<User> = {}
     const orArray: Filter<User>[] = []

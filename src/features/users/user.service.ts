@@ -32,7 +32,7 @@ class UserService {
       email,
     )
     if (userExists) {
-      throw new BadRequestError(Messages.UserEmailLoginExists)
+      throw new BadRequestError(Messages.UserEmailOrLoginExists)
     }
   }
 
