@@ -2,7 +2,7 @@ import { HttpStatus } from '../../../src/common/types/http-statuses.types'
 import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { LoginInput } from '../../../src/features/auth/types/auth.types'
-import { UserInput, UserOutput } from '../../../src/features/users/types/user.types'
+import { UserInput } from '../../../src/features/users/types/user.types'
 import { setupApp } from '../../../src/setupApp'
 import { authTestManager } from '../../utils/auth.util'
 import { clearDb } from '../../utils/clearDb.util'
@@ -34,11 +34,10 @@ const incorrectPassword: LoginInput = {
   password: 'incorrect',
 }
 
-let createdUser: UserOutput
-
 describe('Auth API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
+  const testManager = usersTestManager({ app, authToken })
 
   beforeAll(async () => {
     await runDb()
@@ -51,12 +50,7 @@ describe('Auth API', () => {
   // LOGIN
 
   it('Should authenticate with correct login and password; POST /auth/login', async () => {
-    const createdUserRes = await usersTestManager.create({
-      app,
-      token: authToken,
-      data: testUserData
-    })
-    createdUser = createdUserRes.body
+    await testManager.create({})
 
     await authTestManager.login({
       app,

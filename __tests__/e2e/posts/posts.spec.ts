@@ -45,6 +45,8 @@ describe('Posts API', () => {
     closeDb()
   })
 
+  // POST
+
   it('Should create a post; POST /posts', async () => {
     const createdBlogRes = await blogsTestManager.create({
       app,
@@ -110,12 +112,16 @@ describe('Posts API', () => {
     })
   })
 
+  // GET ALL
+
   it('Should get all posts; GET /posts', async () => {
     const getAllPostsRes = await postsTestManager.getAll({ app })
 
     expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
     expect(getAllPostsRes.body.items.length).toBe(1)
   })
+
+  // GET ONE
 
   it('Should get one post; GET /posts/:id', async () => {
     const getCreatedPostRes = await postsTestManager.getOne({
@@ -124,6 +130,8 @@ describe('Posts API', () => {
     })
     expect(getCreatedPostRes.body.id).toBe(createdPost.id)
   })
+
+  // UPDATE
 
   it('Should update a post; PUT /posts/:id', async () => {
     await postsTestManager.update({
@@ -170,6 +178,8 @@ describe('Posts API', () => {
     })
     expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
   })
+
+  // DELETE
 
   it('Should delete a post; DELETE /posts/:id', async () => {
     const postsResBefore = await postsTestManager.getAll({ app })
