@@ -29,8 +29,8 @@ class BlogQueryRepository {
     return { items, totalCount }
   }
 
-  public async findById(id: ObjectId): Promise<WithId<Blog> | null> {
-    return blogsCollection.findOne({ _id: id })
+  public async findById(id: string): Promise<WithId<Blog> | null> {
+    return blogsCollection.findOne({ _id: new ObjectId(id) })
   }
 }
 

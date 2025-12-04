@@ -24,5 +24,6 @@ export enum BlogSearchQueryFields {
   searchNameTerm = 'searchNameTerm',
 }
 
-export type BlogQueryInput = PaginationAndSorting<BlogSortByFields> &
-  typeof BlogSearchQueryFields
+export type BlogQueryInput = PaginationAndSorting<BlogSortByFields> & {
+  searchNameTerm?: string
+}

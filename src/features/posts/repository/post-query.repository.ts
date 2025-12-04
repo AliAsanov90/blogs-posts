@@ -36,8 +36,8 @@ class PostQueryRepository {
     return await this.findMany(query, blogId)
   }
 
-  public async findById(id: ObjectId): Promise<WithId<Post> | null> {
-    return postsCollection.findOne({ _id: id })
+  public async findById(id: string): Promise<WithId<Post> | null> {
+    return postsCollection.findOne({ _id: new ObjectId(id) })
   }
 }
 
