@@ -11,9 +11,9 @@ class PostService {
     return await postQueryRepository.findMany(queryInput)
   }
 
-  public async getOne(id: string) {
-    return await postRepository.getOne(id)
-  }
+  // public async getOne(id: string) {
+  //   return await postRepository.getOne(id)
+  // }
 
   public async create(inputData: PostInput) {
     const blog = await blogService.getOrThrowExistingBlog(inputData.blogId)
@@ -32,7 +32,7 @@ class PostService {
     const post = await this.getOrThrowExistingPost(id)
 
     if (inputData.blogId !== post.blogId) {
-      throw new BadRequestError(Messages.BlogNotCorrespondPost)
+      throw new BadRequestError(Messages.post.blogNotCorrespondPost)
     }
 
     const updatedPost: Post = {
@@ -48,10 +48,10 @@ class PostService {
   }
 
   private async getOrThrowExistingPost(id: string) {
-    const post = await postRepository.getOne(id)
+    const post = await postQueryRepository.findById(id)
 
     if (!post) {
-      throw new NotFoundError(Messages.PostNotFound)
+      throw new NotFoundError(Messages.post.notFound)
     }
     return post
   }

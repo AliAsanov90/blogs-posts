@@ -13,62 +13,75 @@ import {
   PostSortByFields,
 } from '../../src/features/posts/types/post.types'
 
-type GetAllParams = {
+interface PostsTestManagerParams {
   app: Application
-  httpStatus?: HttpStatus
+  authToken: string
+}
+
+type CommonParams = {
+  status?: HttpStatus
+}
+
+type GetAllParams = CommonParams & {
   query?: Partial<PostQueryInput>
 }
 
-type GetOneParams = GetAllParams & {
+type GetOneParams = CommonParams & {
   id: string
+  query?: Partial<PostQueryInput>
 }
 
-type DeleteParams = GetOneParams & {
+type DeleteParams = CommonParams & {
+  id: string
   token?: string
 }
 
-type CreateParams = GetAllParams & {
+type CreateParams = CommonParams & {
+  token?: string
+  query?: Partial<PostQueryInput>
   data: Partial<PostInput>
-  token?: string
 }
 
-type UpdateParams = CreateParams & {
+type UpdateParams = CommonParams & {
   id: string
+  token?: string
+  data: Partial<PostInput>
 }
 
 const defaultQuery = defaultSortPaginationValues as PaginationAndSorting<PostSortByFields>
 
-export const postsTestManager = {
-  getAll: async ({ app, query, httpStatus = HttpStatus.Ok }: GetAllParams) => {
+export const postsTestManager = ({ app, authToken }: PostsTestManagerParams) => ({
+  getAll: async ({ query, status = HttpStatus.Ok }: GetAllParams) => {
     const queryParams = { ...defaultQuery, ...query }
-
-    return await request(app).get(POSTS).query(queryParams).expect(httpStatus)
+    return await request(app).get(POSTS).query(queryParams).expect(status)
   },
-  getOne: async ({ app, id, httpStatus = HttpStatus.Ok }: GetOneParams) => {
+
+  getOne: async ({ id, status = HttpStatus.Ok }: GetOneParams) => {
     return await request(app)
       .get(POSTS + `/${id}`)
-      .expect(httpStatus)
+      .expect(status)
   },
-  create: async ({ app, token = '', data, httpStatus = HttpStatus.Created }: CreateParams) => {
-    return await request(app).post(POSTS).set(AUTH_HEADER_NAME, token).send(data).expect(httpStatus)
+
+  create: async ({ token = '', data, status = HttpStatus.Created }: CreateParams) => {
+    return await request(app)
+      .post(POSTS)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .send(data)
+      .expect(status)
   },
-  update: async ({
-    app,
-    token = '',
-    data,
-    id,
-    httpStatus = HttpStatus.NoContent,
-  }: UpdateParams) => {
+
+  update: async ({ token = '', data, id, status = HttpStatus.NoContent }: UpdateParams) => {
     return await request(app)
       .put(POSTS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
       .send(data)
-      .expect(httpStatus)
+      .expect(status)
   },
-  delete: async ({ app, token = '', id, httpStatus = HttpStatus.NoContent }: DeleteParams) => {
+
+  delete: async ({ token = '', id, status = HttpStatus.NoContent }: DeleteParams) => {
     return await request(app)
       .delete(POSTS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
-      .expect(httpStatus)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .expect(status)
   },
-}
+})

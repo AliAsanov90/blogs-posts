@@ -1,12 +1,13 @@
-import { Filter, ObjectId, WithId } from 'mongodb'
-import { QueryResult } from '../../../common/types/query-result-output.types'
+import { Filter, ObjectId } from 'mongodb'
+import { PaginatedOutput } from '../../../common/types/query-result-output.types'
 import { usersCollection } from '../../../db/mongo.db'
-import { User, UserQueryInput } from '../types/user.types'
+import { User, UserOutput, UserQueryInput } from '../types/user.types'
+import { mapToUserOutput, mapToUsersPaginatedOutput } from '../utils/user-output.mapper'
 
 type UserSearchFieldKeys = keyof Pick<User, 'login' | 'email'>
 
 class UserQueryRepository {
-  public async findMany(query: UserQueryInput): Promise<QueryResult<User>> {
+  public async findMany(query: UserQueryInput): Promise<PaginatedOutput<UserOutput>> {
     const { pageNumber, pageSize, sortBy, sortDirection, searchEmailTerm, searchLoginTerm } = query
 
     const skip = (pageNumber - 1) * pageSize
@@ -25,11 +26,12 @@ class UserQueryRepository {
 
     const totalCount = await usersCollection.countDocuments(filter)
 
-    return { items, totalCount }
+    return mapToUsersPaginatedOutput(items, totalCount, query)
   }
 
-  public async findById(id: string): Promise<WithId<User> | null> {
-    return usersCollection.findOne({ _id: new ObjectId(id) })
+  public async findById(id: string): Promise<UserOutput | null> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+    return user ? mapToUserOutput(user) : null
   }
 
   private prepareFilterObj(fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>) {

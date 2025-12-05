@@ -6,18 +6,10 @@ import { Post, PostInput, PostQueryInput } from '../posts/types/post.types'
 import { getPostInputFields } from '../posts/utils/get-post-input-fields.util'
 import { blogQueryRepository } from './repository/blog-query.repository'
 import { blogRepository } from './repository/blog.repository'
-import { Blog, BlogInput, BlogQueryInput } from './types/blog.types'
+import { Blog, BlogInput } from './types/blog.types'
 import { getBlogInputFields } from './utils/get-blog-input-fields.util'
 
 class BlogService {
-  public async getAll(queryInput: BlogQueryInput) {
-    return await blogQueryRepository.findMany(queryInput)
-  }
-
-  public async getOne(id: string) {
-    return await blogRepository.getOne(id)
-  }
-
   public async getPostsByBlogId(query: PostQueryInput, blogId: string) {
     await this.getOrThrowExistingBlog(blogId)
     return await postQueryRepository.findManyByBlogId(query, blogId)
@@ -59,10 +51,10 @@ class BlogService {
   }
 
   public async getOrThrowExistingBlog(id: string) {
-    const blog = await blogRepository.getOne(id)
+    const blog = await blogQueryRepository.findById(id)
 
     if (!blog) {
-      throw new NotFoundError(Messages.BlogNotFound)
+      throw new NotFoundError(Messages.blog.notFound)
     }
     return blog
   }

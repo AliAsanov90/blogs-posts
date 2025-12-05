@@ -14,114 +14,106 @@ import {
 } from '../../src/features/blogs/types/blog.types'
 import { PostInput } from '../../src/features/posts/types/post.types'
 
-type GetAllParams = {
+interface BlogsTestManagerParams {
   app: Application
-  httpStatus?: HttpStatus
+  authToken: string
+}
+
+type CommonParams = {
+  status?: HttpStatus
+}
+
+type GetAllParams = CommonParams & {
   query?: Partial<BlogQueryInput>
 }
 
-type GetOneParams = {
-  app: Application
+type GetOneParams = CommonParams & {
   id: string
-  httpStatus?: HttpStatus
 }
 
-type DeleteParams = {
-  app: Application
+type DeleteParams = CommonParams & {
   id: string
-  httpStatus?: HttpStatus
   token?: string
 }
 
-type CreateParams = {
-  app: Application
+type CreateParams = CommonParams & {
   data: BlogInput
   token?: string
-  httpStatus?: HttpStatus
 }
 
-type UpdateParams = {
-  app: Application
+type UpdateParams = CommonParams & {
   id: string
   data: BlogInput
   token?: string
-  httpStatus?: HttpStatus
 }
 
-type GetPostsByBlogIdParams = {
-  app: Application
-  httpStatus?: HttpStatus
+type GetPostsByBlogIdParams = CommonParams & {
   query?: Partial<BlogQueryInput>
   blogId: string
 }
 
-type CreatePostByBlogIdParams = {
-  app: Application
+type CreatePostByBlogIdParams = CommonParams & {
   blogId: string
   data: Omit<PostInput, 'blogId'>
   token?: string
-  httpStatus?: HttpStatus
 }
 
 const defaultQuery = defaultSortPaginationValues as PaginationAndSorting<BlogSortByFields>
 
-export const blogsTestManager = {
-  getAll: async ({ app, query, httpStatus = HttpStatus.Ok }: GetAllParams) => {
+export const blogsTestManager = ({ app, authToken }: BlogsTestManagerParams) => ({
+  getAll: async ({ query, status = HttpStatus.Ok }: GetAllParams) => {
     const queryParams = { ...defaultQuery, ...query }
-
-    return await request(app).get(BLOGS).query(queryParams).expect(httpStatus)
+    return await request(app).get(BLOGS).query(queryParams).expect(status)
   },
-  getOne: async ({ app, id, httpStatus = HttpStatus.Ok }: GetOneParams) => {
+
+  getOne: async ({ id, status = HttpStatus.Ok }: GetOneParams) => {
     return await request(app)
       .get(BLOGS + `/${id}`)
-      .expect(httpStatus)
+      .expect(status)
   },
-  create: async ({ app, token = '', data, httpStatus = HttpStatus.Created }: CreateParams) => {
-    return await request(app).post(BLOGS).set(AUTH_HEADER_NAME, token).send(data).expect(httpStatus)
+
+  create: async ({ token = '', data, status = HttpStatus.Created }: CreateParams) => {
+    return await request(app)
+      .post(BLOGS)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .send(data)
+      .expect(status)
   },
-  update: async ({
-    app,
-    token = '',
-    data,
-    id,
-    httpStatus = HttpStatus.NoContent,
-  }: UpdateParams) => {
+
+  update: async ({ token = '', data, id, status = HttpStatus.NoContent }: UpdateParams) => {
     return await request(app)
       .put(BLOGS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
       .send(data)
-      .expect(httpStatus)
+      .expect(status)
   },
-  delete: async ({ app, token = '', id, httpStatus = HttpStatus.NoContent }: DeleteParams) => {
+
+  delete: async ({ token = '', id, status = HttpStatus.NoContent }: DeleteParams) => {
     return await request(app)
       .delete(BLOGS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
-      .expect(httpStatus)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .expect(status)
   },
-  getPostsByBlogId: async ({
-    app,
-    query,
-    blogId,
-    httpStatus = HttpStatus.Ok,
-  }: GetPostsByBlogIdParams) => {
+
+  getPostsByBlogId: async ({ query, blogId, status = HttpStatus.Ok }: GetPostsByBlogIdParams) => {
     const queryParams = { ...defaultQuery, ...query }
 
     return await request(app)
       .get(BLOGS + `/${blogId}/posts`)
       .query(queryParams)
-      .expect(httpStatus)
+      .expect(status)
   },
+
   createPostByBlogId: async ({
-    app,
     token = '',
     blogId,
     data,
-    httpStatus = HttpStatus.Created,
+    status = HttpStatus.Created,
   }: CreatePostByBlogIdParams) => {
     return await request(app)
       .post(BLOGS + `/${blogId}/posts`)
-      .set(AUTH_HEADER_NAME, token)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
       .send(data)
-      .expect(httpStatus)
+      .expect(status)
   },
-}
+})

@@ -1,10 +1,14 @@
-import { Filter, ObjectId, WithId } from 'mongodb'
-import { QueryResult } from '../../../common/types/query-result-output.types'
+import { Filter, ObjectId } from 'mongodb'
+import { PaginatedOutput } from '../../../common/types/query-result-output.types'
 import { postsCollection } from '../../../db/mongo.db'
-import { Post, PostQueryInput } from '../types/post.types'
+import { Post, PostOutput, PostQueryInput } from '../types/post.types'
+import { mapToPostOutput, mapToPostsPaginatedOutput } from '../utils/post-output.mapper'
 
 class PostQueryRepository {
-  public async findMany(query: PostQueryInput, blogId?: string): Promise<QueryResult<Post>> {
+  public async findMany(
+    query: PostQueryInput,
+    blogId?: string,
+  ): Promise<PaginatedOutput<PostOutput>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = query
 
     const skip = (pageNumber - 1) * pageSize
@@ -23,15 +27,19 @@ class PostQueryRepository {
 
     const totalCount = await postsCollection.countDocuments(filter)
 
-    return { items, totalCount }
+    return mapToPostsPaginatedOutput(items, totalCount, query)
   }
 
-  public async findManyByBlogId(query: PostQueryInput, blogId: string): Promise<QueryResult<Post>> {
+  public async findManyByBlogId(
+    query: PostQueryInput,
+    blogId: string,
+  ): Promise<PaginatedOutput<PostOutput>> {
     return await this.findMany(query, blogId)
   }
 
-  public async findById(id: string): Promise<WithId<Post> | null> {
-    return postsCollection.findOne({ _id: new ObjectId(id) })
+  public async findById(id: string): Promise<PostOutput | null> {
+    const post = await postsCollection.findOne({ _id: new ObjectId(id) })
+    return post ? mapToPostOutput(post) : null
   }
 }
 

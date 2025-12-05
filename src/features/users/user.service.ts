@@ -29,7 +29,7 @@ class UserService {
   private async checkUserLoginEmailExists(login: string, email: string) {
     const userExists = await userRepository.getUserExistsByLoginOrEmail(login, email)
     if (userExists) {
-      throw new BadRequestError(Messages.UserEmailOrLoginExists)
+      throw new BadRequestError(Messages.user.emailOrLoginExists)
     }
   }
 
@@ -37,7 +37,7 @@ class UserService {
     const user = await userRepository.getOneById(id)
 
     if (!user) {
-      throw new NotFoundError(Messages.UserNotFound)
+      throw new NotFoundError(Messages.user.notFound)
     }
     return user
   }

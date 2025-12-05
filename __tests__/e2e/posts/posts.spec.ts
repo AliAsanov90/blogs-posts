@@ -35,6 +35,8 @@ let createdPost: PostOutput
 describe('Posts API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
+  const postHelper = postsTestManager({ app, authToken })
+  const blogHelper = blogsTestManager({ app, authToken })
 
   beforeAll(async () => {
     await runDb()
@@ -48,16 +50,14 @@ describe('Posts API', () => {
   // POST
 
   it('Should create a post; POST /posts', async () => {
-    const createdBlogRes = await blogsTestManager.create({
-      app,
+    const createdBlogRes = await blogHelper.create({
       token: authToken,
       data: testBlogData,
     })
 
     testPostData.blogId = createdBlogRes.body.id
 
-    const createdRes = await postsTestManager.create({
-      app,
+    const createdRes = await postHelper.create({
       token: authToken,
       data: testPostData,
     })
@@ -67,55 +67,50 @@ describe('Posts API', () => {
   })
 
   it('Should not create a post if blog does not exist; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       token: authToken,
       data: { ...testPostData, blogId: '691fe02e62d2354296c74851' },
-      httpStatus: HttpStatus.NotFound,
+      status: HttpStatus.NotFound,
     })
   })
 
   it('Should not create a post if blogId is not passed in req.body; POST /posts', async () => {
     const { blogId, ...restTestPostData } = testPostData
 
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       token: authToken,
       data: restTestPostData,
-      httpStatus: HttpStatus.BadRequest,
+      status: HttpStatus.BadRequest,
     })
   })
 
   it('Should not create a post without auth header; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       data: testPostData,
-      httpStatus: HttpStatus.Unauthorized,
+      status: HttpStatus.Unauthorized,
     })
   })
 
   it('Should not create a post with incorrect auth token; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       token: 'Basic sfsdfsdsdfsdsf',
       data: testPostData,
-      httpStatus: HttpStatus.Unauthorized,
+      status: HttpStatus.Unauthorized,
     })
   })
 
   it('Should not create a post if body is incorrect; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       token: authToken,
       data: incorrectTestPostData,
-      httpStatus: HttpStatus.BadRequest,
+      status: HttpStatus.BadRequest,
     })
   })
 
   // GET ALL
 
   it('Should get all posts; GET /posts', async () => {
-    const getAllPostsRes = await postsTestManager.getAll({ app })
+    const getAllPostsRes = await postHelper.getAll({})
 
     expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
     expect(getAllPostsRes.body.items.length).toBe(1)
@@ -124,8 +119,7 @@ describe('Posts API', () => {
   // GET ONE
 
   it('Should get one post; GET /posts/:id', async () => {
-    const getCreatedPostRes = await postsTestManager.getOne({
-      app,
+    const getCreatedPostRes = await postHelper.getOne({
       id: createdPost.id,
     })
     expect(getCreatedPostRes.body.id).toBe(createdPost.id)
@@ -134,39 +128,34 @@ describe('Posts API', () => {
   // UPDATE
 
   it('Should update a post; PUT /posts/:id', async () => {
-    await postsTestManager.update({
-      app,
+    await postHelper.update({
       id: createdPost.id,
       token: authToken,
       data: { ...testPostData, title: 'Test title 2' },
     })
 
-    const updatedPostRes = await postsTestManager.getOne({
-      app,
+    const updatedPostRes = await postHelper.getOne({
       id: createdPost.id,
     })
     expect(updatedPostRes.body.title).toBe('Test title 2')
   })
 
   it('Should not update a not found post; UPDATE /posts/:id', async () => {
-    await postsTestManager.update({
-      app,
+    await postHelper.update({
       id: '691fe02e62d2354296c74851',
       token: authToken,
       data: { ...testPostData, title: 'Test title 3' },
-      httpStatus: HttpStatus.NotFound,
+      status: HttpStatus.NotFound,
     })
   })
 
   it('Should not update a post if given blogId is different from post.blogId; UPDATE /posts/:id', async () => {
-    const differentBlogRes = await blogsTestManager.create({
-      app,
+    const differentBlogRes = await blogHelper.create({
       token: authToken,
       data: testBlogData,
     })
 
-    const res = await postsTestManager.update({
-      app,
+    const res = await postHelper.update({
       id: createdPost.id,
       token: authToken,
       data: {
@@ -174,44 +163,40 @@ describe('Posts API', () => {
         title: 'Test title 4',
         blogId: differentBlogRes.body.id,
       },
-      httpStatus: HttpStatus.BadRequest,
+      status: HttpStatus.BadRequest,
     })
-    expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
+    expect(res.body.message).toBe(Messages.post.blogNotCorrespondPost)
   })
 
   // DELETE
 
   it('Should delete a post; DELETE /posts/:id', async () => {
-    const postsResBefore = await postsTestManager.getAll({ app })
+    const postsResBefore = await postHelper.getAll({})
     expect(postsResBefore.body.items.length).toBe(1)
 
-    await postsTestManager.getOne({
-      app,
+    await postHelper.getOne({
       id: createdPost.id,
     })
 
-    await postsTestManager.delete({
-      app,
+    await postHelper.delete({
       id: createdPost.id,
       token: authToken,
     })
 
-    await postsTestManager.getOne({
-      app,
+    await postHelper.getOne({
       id: createdPost.id,
-      httpStatus: HttpStatus.NotFound,
+      status: HttpStatus.NotFound,
     })
 
-    const postsResAfter = await postsTestManager.getAll({ app })
+    const postsResAfter = await postHelper.getAll({})
     expect(postsResAfter.body.items.length).toBe(0)
   })
 
   it('Should not delete a not found post; DELETE /posts/:id', async () => {
-    await postsTestManager.delete({
-      app,
+    await postHelper.delete({
       id: '691fe02e62d2354296c74851',
       token: authToken,
-      httpStatus: HttpStatus.NotFound,
+      status: HttpStatus.NotFound,
     })
   })
 })

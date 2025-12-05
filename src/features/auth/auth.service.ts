@@ -15,7 +15,7 @@ class AuthService {
     const user = await authRepository.findOneByLoginOrEmail(loginOrEmail)
 
     if (!user) {
-      throw new UnauthorizedError(Messages.InCorrectLoginOrPassword)
+      throw new UnauthorizedError(Messages.auth.incorrectLoginOrPassword)
     }
     return user
   }

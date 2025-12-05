@@ -11,30 +11,27 @@ import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort
 import { postService } from './post.service'
 import { postQueryRepository } from './repository/post-query.repository'
 import { PostInput, PostQueryInput, PostSortByFields } from './types/post.types'
-import { mapToPostOutput, mapToPostsPaginatedOutput } from './utils/post-output.mapper'
 
 class PostController {
   public getAll = catchAsync(async (req: RequestWithQuery<PostSortByFields>, res: Response) => {
     const queryInput = setDefaultSortAndPagination<PostQueryInput>(req.sanitizedQuery)
 
-    const { items, totalCount } = await postService.getAll(queryInput)
+    const result = await postService.getAll(queryInput)
 
-    res.status(HttpStatus.Ok).send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
+    res.status(HttpStatus.Ok).send(result)
   })
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
-    const post = await postService.getOne(req.params.id)
+    const post = await postQueryRepository.findById(req.params.id)
 
-    return post
-      ? res.status(HttpStatus.Ok).send(mapToPostOutput(post))
-      : res.sendStatus(HttpStatus.NotFound)
+    return post ? res.status(HttpStatus.Ok).send(post) : res.sendStatus(HttpStatus.NotFound)
   })
 
   public create = catchAsync(async (req: RequestWithBody<PostInput>, res: Response) => {
     const createdPostId = await postService.create(req.body)
     const post = await postQueryRepository.findById(createdPostId)
 
-    res.status(HttpStatus.Created).send(mapToPostOutput(post!))
+    res.status(HttpStatus.Created).send(post)
   })
 
   public update = catchAsync(async (req: RequestWithIdAndBody<PostInput>, res: Response) => {

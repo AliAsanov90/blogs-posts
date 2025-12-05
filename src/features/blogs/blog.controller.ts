@@ -12,7 +12,6 @@ import { catchAsync } from '../../common/utils/catch-async.util'
 import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
 import { postQueryRepository } from '../posts/repository/post-query.repository'
 import { PostInput, PostQueryInput, PostSortByFields } from '../posts/types/post.types'
-import { mapToPostOutput, mapToPostsPaginatedOutput } from '../posts/utils/post-output.mapper'
 import { blogService } from './blog.service'
 import { blogQueryRepository } from './repository/blog-query.repository'
 import {
@@ -21,37 +20,31 @@ import {
   BlogSearchQueryFields,
   BlogSortByFields,
 } from './types/blog.types'
-import { mapToBlogOutput, mapToBlogsPaginatedOutput } from './utils/blog-output.mapper'
 
 class BlogController {
   public getAll = catchAsync(
     async (req: RequestWithQuery<BlogSortByFields, BlogSearchQueryFields>, res: Response) => {
       const queryInput = setDefaultSortAndPagination<BlogQueryInput>(req.sanitizedQuery)
 
-      const { items, totalCount } = await blogService.getAll(queryInput)
+      const result = await blogQueryRepository.findMany(queryInput)
 
-      res.status(HttpStatus.Ok).send(mapToBlogsPaginatedOutput(items, totalCount, queryInput))
+      res.status(HttpStatus.Ok).send(result)
     },
   )
 
   public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
-    const blog = await blogService.getOne(req.params.id)
+    const blog = await blogQueryRepository.findById(req.params.id)
 
-    return blog
-      ? res.status(HttpStatus.Ok).send(mapToBlogOutput(blog))
-      : res.sendStatus(HttpStatus.NotFound)
+    return blog ? res.status(HttpStatus.Ok).send(blog) : res.sendStatus(HttpStatus.NotFound)
   })
 
   public getPostsByBlogId = catchAsync(
     async (req: RequestWithBlogIdAndQuery<PostSortByFields>, res: Response) => {
       const queryInput = setDefaultSortAndPagination<PostQueryInput>(req.sanitizedQuery)
 
-      const { items, totalCount } = await blogService.getPostsByBlogId(
-        queryInput,
-        req.params.blogId,
-      )
+      const result = await blogService.getPostsByBlogId(queryInput, req.params.blogId)
 
-      res.status(HttpStatus.Ok).send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
+      res.status(HttpStatus.Ok).send(result)
     },
   )
 
@@ -62,7 +55,7 @@ class BlogController {
       const createdPostId = await blogService.createPostByBlogId(inputData)
       const post = await postQueryRepository.findById(createdPostId)
 
-      res.status(HttpStatus.Created).send(mapToPostOutput(post!))
+      res.status(HttpStatus.Created).send(post)
     },
   )
 
@@ -70,7 +63,7 @@ class BlogController {
     const createdBlogId = await blogService.create(req.body)
     const blog = await blogQueryRepository.findById(createdBlogId)
 
-    res.status(HttpStatus.Created).send(mapToBlogOutput(blog!))
+    res.status(HttpStatus.Created).send(blog)
   })
 
   public update = catchAsync(async (req: RequestWithIdAndBody<BlogInput>, res: Response) => {
