@@ -23,7 +23,7 @@ export default defineConfig([
   // 2. Base JS/TS rules for all source files
   // ───────────────────────────────────────────────
   {
-    files: ['src/**/*.{ts,cts,mts,js,cjs,mjs}'],
+    files: ['src/**/*.{ts,cts,mts,js,cjs,mjs}', '__tests__/**/*.{ts}'],
     ignores: ['dist/**', 'node_modules/**'],
 
     languageOptions: {
@@ -53,7 +53,10 @@ export default defineConfig([
       // '@typescript-eslint/restrict-template-expressions': ['error', {
       //   allow: [{ 'name': 'error', 'from': 'lib' }]
       // }],
-      '@stylistic/newline-per-chained-call': ['error', { 'ignoreChainWithDepth': 2 }],
+      'object-curly-spacing': ['error', 'always'],
+      '@typescript-eslint/object-curly-spacing': ['error', 'always'],
+      '@stylistic/object-curly-spacing': ['error', 'always'],
+      '@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
       'prettier/prettier': 'error',
     },
   },
@@ -61,11 +64,17 @@ export default defineConfig([
   // ───────────────────────────────────────────────
   // 3. TypeScript ESLint recommended rules
   // ───────────────────────────────────────────────
-  ...tseslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked, // type-aware rules
+  {
+    files: ['src/**/*.{ts,cts,mts}', '__tests__/**/*.{ts}'],
+    ...tseslint.configs.recommended[0],
+  },
+  {
+    files: ['src/**/*.{ts,cts,mts}', '__tests__/**/*.{ts}'],
+    ...tseslint.configs.recommendedTypeChecked[0],
+  },
 
   // ───────────────────────────────────────────────
   // 4. Prettier (must be last)
   // ───────────────────────────────────────────────
   prettierConfig,
-]);
+])

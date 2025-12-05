@@ -6,9 +6,4 @@ import { loginInputValidation } from './utils/login-input.validation'
 
 export const authRouter: Router = Router()
 
-authRouter.post(
-  LOGIN,
-  loginInputValidation,
-  validationResultMiddleware,
-  authController.login,
-)
+authRouter.post(LOGIN, loginInputValidation, validationResultMiddleware, authController.login)

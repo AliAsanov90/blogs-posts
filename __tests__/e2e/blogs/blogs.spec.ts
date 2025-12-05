@@ -22,14 +22,14 @@ const updatedTestBlogData: BlogInput = {
 const incorrectTestBlogData: BlogInput = {
   name: '         ',
   description: 'Test short description',
-  websiteUrl: 'websiteUrl'
+  websiteUrl: 'websiteUrl',
 }
 
 const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '691fe02e62d2354296c74857'
+  blogId: '691fe02e62d2354296c74857',
 }
 
 let createdBlog: BlogOutput
@@ -52,7 +52,7 @@ describe('Blogs API', () => {
     const createdBlogRes = await blogsTestManager.create({
       app,
       token: authToken,
-      data: testBlogData
+      data: testBlogData,
     })
 
     const blogsRes = await blogsTestManager.getAll({ app })
@@ -69,7 +69,7 @@ describe('Blogs API', () => {
       app,
       token: undefined,
       data: testBlogData,
-      httpStatus: HttpStatus.Unauthorized
+      httpStatus: HttpStatus.Unauthorized,
     })
   })
 
@@ -78,16 +78,16 @@ describe('Blogs API', () => {
       app,
       token: 'Basic sfsdfsdsdfsdsf',
       data: testBlogData,
-      httpStatus: HttpStatus.Unauthorized
+      httpStatus: HttpStatus.Unauthorized,
     })
   })
 
   it('Should not create a blog if body is incorrect; POST /blogs', async () => {
-     await blogsTestManager.create({
+    await blogsTestManager.create({
       app,
       token: authToken,
       data: incorrectTestBlogData,
-      httpStatus: HttpStatus.BadRequest
+      httpStatus: HttpStatus.BadRequest,
     })
   })
 
@@ -103,7 +103,7 @@ describe('Blogs API', () => {
   it('Should get blogs that match "searchNameTerm" query param; GET /blogs?searchNameTerm={MATCH}', async () => {
     const getBlogsRes = await blogsTestManager.getAll({
       app,
-      query: { searchNameTerm: 'test' }
+      query: { searchNameTerm: 'test' },
     })
     expect(getBlogsRes.body.items.length).toBe(1)
   })
@@ -111,7 +111,7 @@ describe('Blogs API', () => {
   it('Shouldn\'t get any blogs if "searchNameTerm" query does not match; GET /blogs?searchNameTerm={NOT_MATCH}', async () => {
     const getBlogsRes = await blogsTestManager.getAll({
       app,
-      query: { searchNameTerm: 'blog' }
+      query: { searchNameTerm: 'blog' },
     })
     expect(getBlogsRes.body.items.length).toBe(0)
   })
@@ -121,7 +121,7 @@ describe('Blogs API', () => {
   it('Should get one blog; GET /blogs/:id', async () => {
     const getOneRes = await blogsTestManager.getOne({
       app,
-      id: createdBlog.id
+      id: createdBlog.id,
     })
     expect(getOneRes.body.id).toBe(createdBlog.id)
   })
@@ -130,7 +130,7 @@ describe('Blogs API', () => {
     await blogsTestManager.getOne({
       app,
       id: '691fe02e62d2354296c74851',
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 
@@ -139,19 +139,19 @@ describe('Blogs API', () => {
   it('Should get posts of specific blog; GET /blogs/:blogId/posts', async () => {
     const getBlogPostsResBefore = await blogsTestManager.getPostsByBlogId({
       app,
-      blogId: createdBlog.id
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResBefore.body.items.length).toBe(0)
 
     await postsTestManager.create({
       app,
       token: authToken,
-      data: { ...testPostData, blogId: createdBlog.id }
+      data: { ...testPostData, blogId: createdBlog.id },
     })
 
     const getBlogPostsResAfter = await blogsTestManager.getPostsByBlogId({
       app,
-      blogId: createdBlog.id
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResAfter.body.items.length).toBe(1)
   })
@@ -161,7 +161,7 @@ describe('Blogs API', () => {
   it('Should create a post for specific blog; POST /blogs/:blogId/posts', async () => {
     const getBlogPostsResBefore = await blogsTestManager.getPostsByBlogId({
       app,
-      blogId: createdBlog.id
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResBefore.body.items.length).toBe(1)
 
@@ -171,12 +171,12 @@ describe('Blogs API', () => {
       app,
       token: authToken,
       blogId: createdBlog.id,
-      data: restData
+      data: restData,
     })
 
     const getBlogPostsResAfter = await blogsTestManager.getPostsByBlogId({
       app,
-      blogId: createdBlog.id
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResAfter.body.items.length).toBe(2)
   })
@@ -193,13 +193,13 @@ describe('Blogs API', () => {
 
     const updatedPostRes = await blogsTestManager.getOne({
       app,
-      id: createdBlog.id
+      id: createdBlog.id,
     })
 
     expect(updatedPostRes.body).toEqual({
       ...updatedPostRes.body,
       ...updatedTestBlogData,
-      id: createdBlog.id
+      id: createdBlog.id,
     })
   })
 
@@ -209,7 +209,7 @@ describe('Blogs API', () => {
       id: '691fe02e62d2354296c74851',
       token: authToken,
       data: testBlogData,
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 
@@ -233,7 +233,7 @@ describe('Blogs API', () => {
     await blogsTestManager.getOne({
       app,
       id: createdBlog.id,
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
 
     const blogsResAfter = await blogsTestManager.getAll({ app })
@@ -245,7 +245,7 @@ describe('Blogs API', () => {
       app,
       id: '691fe02e62d2354296c74851',
       token: authToken,
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 })

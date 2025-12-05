@@ -3,9 +3,7 @@ import {
   PaginationAndSorting,
 } from '../middleware/query-validation.middleware'
 
-export const setDefaultSortAndPagination = <
-  T extends PaginationAndSorting<T['sortBy']>,
->(
+export const setDefaultSortAndPagination = <T extends PaginationAndSorting<T['sortBy']>>(
   query: Partial<T>,
 ) =>
   ({

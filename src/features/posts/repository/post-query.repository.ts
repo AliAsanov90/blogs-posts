@@ -4,10 +4,7 @@ import { postsCollection } from '../../../db/mongo.db'
 import { Post, PostQueryInput } from '../types/post.types'
 
 class PostQueryRepository {
-  public async findMany(
-    query: PostQueryInput,
-    blogId?: string,
-  ): Promise<QueryResult<Post>> {
+  public async findMany(query: PostQueryInput, blogId?: string): Promise<QueryResult<Post>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = query
 
     const skip = (pageNumber - 1) * pageSize
@@ -29,10 +26,7 @@ class PostQueryRepository {
     return { items, totalCount }
   }
 
-  public async findManyByBlogId(
-    query: PostQueryInput,
-    blogId: string,
-  ): Promise<QueryResult<Post>> {
+  public async findManyByBlogId(query: PostQueryInput, blogId: string): Promise<QueryResult<Post>> {
     return await this.findMany(query, blogId)
   }
 

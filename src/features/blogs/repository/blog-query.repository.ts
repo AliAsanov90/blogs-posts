@@ -4,11 +4,8 @@ import { blogsCollection } from '../../../db/mongo.db'
 import { Blog, BlogQueryInput } from '../types/blog.types'
 
 class BlogQueryRepository {
-  public async findMany(
-    queryInput: BlogQueryInput,
-  ): Promise<QueryResult<Blog>> {
-    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } =
-      queryInput
+  public async findMany(queryInput: BlogQueryInput): Promise<QueryResult<Blog>> {
+    const { searchNameTerm, sortBy, sortDirection, pageNumber, pageSize } = queryInput
 
     const skip = (pageNumber - 1) * pageSize
     const filter: Filter<Blog> = {}

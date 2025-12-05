@@ -9,10 +9,7 @@ export type RequestWithSanitizedQuery = Request & {
   sanitizedQuery?: Record<string, unknown>
 }
 
-export type RequestWithQuery<
-  TSortByFields,
-  TSearchQueryFields = never,
-> = Request<
+export type RequestWithQuery<TSortByFields, TSearchQueryFields = never> = Request<
   unknown,
   unknown,
   unknown,
@@ -30,11 +27,7 @@ export type TSearchQueryFieldKeys = keyof typeof SearchQueryFields
 
 export type RequestWithBody<TBody> = Request<unknown, unknown, TBody>
 
-export type RequestWithIdAndBody<TBody> = Request<
-  { id: string },
-  unknown,
-  TBody
->
+export type RequestWithIdAndBody<TBody> = Request<{ id: string }, unknown, TBody>
 
 export type RequestWithBlogIdAndQuery<TSortByFields> = Request<
   { blogId: string },
@@ -45,8 +38,4 @@ export type RequestWithBlogIdAndQuery<TSortByFields> = Request<
   sanitizedQuery: PaginationAndSorting<TSortByFields>
 }
 
-export type RequestWithBlogIdAndBody<TBody> = Request<
-  { blogId: string },
-  unknown,
-  TBody
->
+export type RequestWithBlogIdAndBody<TBody> = Request<{ blogId: string }, unknown, TBody>

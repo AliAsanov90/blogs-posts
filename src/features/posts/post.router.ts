@@ -37,10 +37,4 @@ postRouter
     postController.update,
   )
 
-  .delete(
-    ID,
-    authGuardMiddleware,
-    idValidation,
-    validationResultMiddleware,
-    postController.delete,
-  )
+  .delete(ID, authGuardMiddleware, idValidation, validationResultMiddleware, postController.delete)

@@ -57,10 +57,4 @@ blogRouter
     blogController.update,
   )
 
-  .delete(
-    ID,
-    authGuardMiddleware,
-    idValidation,
-    validationResultMiddleware,
-    blogController.delete,
-  )
+  .delete(ID, authGuardMiddleware, idValidation, validationResultMiddleware, blogController.delete)

@@ -7,14 +7,7 @@ type UserSearchFieldKeys = keyof Pick<User, 'login' | 'email'>
 
 class UserQueryRepository {
   public async findMany(query: UserQueryInput): Promise<QueryResult<User>> {
-    const {
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-      searchEmailTerm,
-      searchLoginTerm,
-    } = query
+    const { pageNumber, pageSize, sortBy, sortDirection, searchEmailTerm, searchLoginTerm } = query
 
     const skip = (pageNumber - 1) * pageSize
 
@@ -39,9 +32,7 @@ class UserQueryRepository {
     return usersCollection.findOne({ _id: new ObjectId(id) })
   }
 
-  private prepareFilterObj(
-    fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>,
-  ) {
+  private prepareFilterObj(fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>) {
     const filterObj: Filter<User> = {}
     const orArray: Filter<User>[] = []
 

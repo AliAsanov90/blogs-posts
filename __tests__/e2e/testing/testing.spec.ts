@@ -16,9 +16,7 @@ describe('Testing API', () => {
   })
 
   it('Should delete all blogs and posts', async () => {
-    await request(app)
-      .delete(TESTING_ALL_DATA)
-      .expect(HttpStatus.NoContent)
+    await request(app).delete(TESTING_ALL_DATA).expect(HttpStatus.NoContent)
 
     const blogsRes = await request(app).get(BLOGS)
     const postsRes = await request(app).get(POSTS)

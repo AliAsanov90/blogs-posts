@@ -37,47 +37,46 @@ const incorrectPassword: LoginInput = {
 describe('Auth API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
-  const testManager = usersTestManager({ app, authToken })
+  const userHelper = usersTestManager({ app, authToken })
+  const authHelper = authTestManager({ app })
 
   beforeAll(async () => {
     await runDb()
   })
+
   afterAll(async () => {
     await clearDb(app)
     closeDb()
   })
 
   // LOGIN
+  describe('LOGIN endpoint; POST -> /auth/login', () => {
+    it('Should authenticate with correct login and password', async () => {
+      await userHelper.create({})
 
-  it('Should authenticate with correct login and password; POST /auth/login', async () => {
-    await testManager.create({})
-
-    await authTestManager.login({
-      app,
-      data: testLoginDataWithLogin
+      await authHelper.login({
+        data: testLoginDataWithLogin,
+      })
     })
-  })
 
-  it('Should authenticate with correct email and password; POST /auth/login', async () => {
-    await authTestManager.login({
-      app,
-      data: testLoginDataWithEmail
+    it('Should authenticate with correct email and password', async () => {
+      await authHelper.login({
+        data: testLoginDataWithEmail,
+      })
     })
-  })
 
-  it('Should not authenticate with incorrect email or login; POST /auth/login', async () => {
-    await authTestManager.login({
-      app,
-      data: incorrectLoginOrEmail,
-      httpStatus: HttpStatus.Unauthorized
+    it('Should not authenticate with incorrect email or login', async () => {
+      await authHelper.login({
+        data: incorrectLoginOrEmail,
+        status: HttpStatus.Unauthorized,
+      })
     })
-  })
 
-  it('Should not authenticate with incorrect password; POST /auth/login', async () => {
-    await authTestManager.login({
-      app,
-      data: incorrectPassword,
-      httpStatus: HttpStatus.Unauthorized
+    it('Should not authenticate with incorrect password', async () => {
+      await authHelper.login({
+        data: incorrectPassword,
+        status: HttpStatus.Unauthorized,
+      })
     })
   })
 })

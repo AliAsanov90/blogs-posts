@@ -3,12 +3,7 @@ import { PaginationAndSorting } from '../../../common/middleware/query-validatio
 import { PaginatedOutput } from '../../../common/types/query-result-output.types'
 import { User, UserOutput, UserSortByFields } from '../types/user.types'
 
-export function mapToUserOutput({
-  _id,
-  login,
-  email,
-  createdAt,
-}: WithId<User>): UserOutput {
+export function mapToUserOutput({ _id, login, email, createdAt }: WithId<User>): UserOutput {
   return {
     id: _id.toString(),
     login,

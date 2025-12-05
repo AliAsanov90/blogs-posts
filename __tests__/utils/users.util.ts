@@ -2,11 +2,18 @@ import { Application } from 'express'
 import request from 'supertest'
 import { AUTH_HEADER_NAME } from '../../src/common/constants/common'
 import { USERS } from '../../src/common/constants/routes'
-import { defaultSortPaginationValues, PaginationAndSorting } from '../../src/common/middleware/query-validation.middleware'
+import {
+  defaultSortPaginationValues,
+  PaginationAndSorting,
+} from '../../src/common/middleware/query-validation.middleware'
 import { HttpStatus } from '../../src/common/types/http-statuses.types'
-import { UserInput, UserQueryInput, UserSortByFields } from '../../src/features/users/types/user.types'
+import {
+  UserInput,
+  UserQueryInput,
+  UserSortByFields,
+} from '../../src/features/users/types/user.types'
 
-type TUsersTestManagerParams = {
+type UsersTestManagerParams = {
   app: Application
   authToken: string
 }
@@ -37,7 +44,7 @@ const defaultUserInputData: UserInput = {
   email: 'test@gmail.com',
 }
 
-export const usersTestManager = ({ app, authToken }: TUsersTestManagerParams) => ({
+export const usersTestManager = ({ app, authToken }: UsersTestManagerParams) => ({
   getAll: async ({ token, query, status = HttpStatus.Ok }: GetAllParams) => {
     const queryParams = { ...defaultQuery, ...query }
 

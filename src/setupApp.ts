@@ -1,12 +1,5 @@
 import express, { Application } from 'express'
-import {
-  AUTH,
-  BLOGS,
-  HOME,
-  POSTS,
-  TESTING,
-  USERS,
-} from './common/constants/routes'
+import { AUTH, BLOGS, HOME, POSTS, TESTING, USERS } from './common/constants/routes'
 import { authRouter } from './features/auth/auth.router'
 import { blogRouter } from './features/blogs/blog.router'
 import { postRouter } from './features/posts/post.router'

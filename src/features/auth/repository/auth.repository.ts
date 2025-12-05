@@ -3,9 +3,7 @@ import { usersCollection } from '../../../db/mongo.db'
 import { User } from '../../users/types/user.types'
 
 class AuthRepository {
-  public async findOneByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<WithId<User> | null> {
+  public async findOneByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
     return usersCollection.findOne({
       $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
     })

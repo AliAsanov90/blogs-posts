@@ -5,16 +5,19 @@ import { HttpStatus } from '../../src/common/types/http-statuses.types'
 import { LoginInput } from '../../src/features/auth/types/auth.types'
 
 type LoginParams = {
-  app: Application
   data: LoginInput
-  httpStatus?: HttpStatus
+  status?: HttpStatus
 }
 
-export const authTestManager = {
-  login: async ({ app, data, httpStatus = HttpStatus.NoContent }: LoginParams) => {
+interface AuthTestManagerParams {
+  app: Application
+}
+
+export const authTestManager = ({ app }: AuthTestManagerParams) => ({
+  login: async ({ data, status = HttpStatus.NoContent }: LoginParams) => {
     return await request(app)
       .post(AUTH + LOGIN)
       .send(data)
-      .expect(httpStatus)
+      .expect(status)
   },
-}
+})

@@ -27,10 +27,7 @@ class UserService {
   }
 
   private async checkUserLoginEmailExists(login: string, email: string) {
-    const userExists = await userRepository.getUserExistsByLoginOrEmail(
-      login,
-      email,
-    )
+    const userExists = await userRepository.getUserExistsByLoginOrEmail(login, email)
     if (userExists) {
       throw new BadRequestError(Messages.UserEmailOrLoginExists)
     }

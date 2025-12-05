@@ -19,14 +19,14 @@ const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '691fe02e62d2354296c74857'
+  blogId: '691fe02e62d2354296c74857',
 }
 
 const incorrectTestPostData: PostInput = {
   title: '         ',
   shortDescription: 'Test short description',
   content: '',
-  blogId: 'blogId'
+  blogId: 'blogId',
 }
 
 let createdBlog: BlogOutput
@@ -59,7 +59,7 @@ describe('Posts API', () => {
     const createdRes = await postsTestManager.create({
       app,
       token: authToken,
-      data: testPostData
+      data: testPostData,
     })
 
     createdBlog = createdBlogRes.body
@@ -71,7 +71,7 @@ describe('Posts API', () => {
       app,
       token: authToken,
       data: { ...testPostData, blogId: '691fe02e62d2354296c74851' },
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 
@@ -82,7 +82,7 @@ describe('Posts API', () => {
       app,
       token: authToken,
       data: restTestPostData,
-      httpStatus: HttpStatus.BadRequest
+      httpStatus: HttpStatus.BadRequest,
     })
   })
 
@@ -90,7 +90,7 @@ describe('Posts API', () => {
     await postsTestManager.create({
       app,
       data: testPostData,
-      httpStatus: HttpStatus.Unauthorized
+      httpStatus: HttpStatus.Unauthorized,
     })
   })
 
@@ -99,7 +99,7 @@ describe('Posts API', () => {
       app,
       token: 'Basic sfsdfsdsdfsdsf',
       data: testPostData,
-      httpStatus: HttpStatus.Unauthorized
+      httpStatus: HttpStatus.Unauthorized,
     })
   })
 
@@ -108,7 +108,7 @@ describe('Posts API', () => {
       app,
       token: authToken,
       data: incorrectTestPostData,
-      httpStatus: HttpStatus.BadRequest
+      httpStatus: HttpStatus.BadRequest,
     })
   })
 
@@ -126,7 +126,7 @@ describe('Posts API', () => {
   it('Should get one post; GET /posts/:id', async () => {
     const getCreatedPostRes = await postsTestManager.getOne({
       app,
-      id: createdPost.id
+      id: createdPost.id,
     })
     expect(getCreatedPostRes.body.id).toBe(createdPost.id)
   })
@@ -143,7 +143,7 @@ describe('Posts API', () => {
 
     const updatedPostRes = await postsTestManager.getOne({
       app,
-      id: createdPost.id
+      id: createdPost.id,
     })
     expect(updatedPostRes.body.title).toBe('Test title 2')
   })
@@ -154,7 +154,7 @@ describe('Posts API', () => {
       id: '691fe02e62d2354296c74851',
       token: authToken,
       data: { ...testPostData, title: 'Test title 3' },
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 
@@ -172,9 +172,9 @@ describe('Posts API', () => {
       data: {
         ...testPostData,
         title: 'Test title 4',
-        blogId: differentBlogRes.body.id
+        blogId: differentBlogRes.body.id,
       },
-      httpStatus: HttpStatus.BadRequest
+      httpStatus: HttpStatus.BadRequest,
     })
     expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
   })
@@ -193,13 +193,13 @@ describe('Posts API', () => {
     await postsTestManager.delete({
       app,
       id: createdPost.id,
-      token: authToken
+      token: authToken,
     })
 
     await postsTestManager.getOne({
       app,
       id: createdPost.id,
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
 
     const postsResAfter = await postsTestManager.getAll({ app })
@@ -211,7 +211,7 @@ describe('Posts API', () => {
       app,
       id: '691fe02e62d2354296c74851',
       token: authToken,
-      httpStatus: HttpStatus.NotFound
+      httpStatus: HttpStatus.NotFound,
     })
   })
 })

@@ -15,10 +15,7 @@ class UserRepository {
     return !!deletedCount
   }
 
-  public async getUserExistsByLoginOrEmail(
-    login: string,
-    email: string,
-  ): Promise<boolean> {
+  public async getUserExistsByLoginOrEmail(login: string, email: string): Promise<boolean> {
     const filter: Filter<User> = {
       $or: [{ login }, { email }],
     }
