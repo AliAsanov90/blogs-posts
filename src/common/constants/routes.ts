@@ -19,3 +19,4 @@ export const USERS = '/users'
 // AUTH routes
 export const AUTH = '/auth'
 export const LOGIN = '/login'
+export const ME = '/me'

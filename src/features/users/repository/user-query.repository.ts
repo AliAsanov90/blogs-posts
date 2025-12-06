@@ -1,8 +1,12 @@
 import { Filter, ObjectId } from 'mongodb'
 import { PaginatedOutput } from '../../../common/types/query-result-output.types'
 import { usersCollection } from '../../../db/mongo.db'
-import { User, UserOutput, UserQueryInput } from '../types/user.types'
-import { mapToUserOutput, mapToUsersPaginatedOutput } from '../utils/user-output.mapper'
+import { User, UserMeOutput, UserOutput, UserQueryInput } from '../types/user.types'
+import {
+  mapToMeUser,
+  mapToUserOutput,
+  mapToUsersPaginatedOutput,
+} from '../utils/user-output.mapper'
 
 type UserSearchFieldKeys = keyof Pick<User, 'login' | 'email'>
 
@@ -12,7 +16,7 @@ class UserQueryRepository {
 
     const skip = (pageNumber - 1) * pageSize
 
-    const filter = this.prepareFilterObj({
+    const filter = this._prepareFilterObj({
       email: searchEmailTerm,
       login: searchLoginTerm,
     })
@@ -34,7 +38,12 @@ class UserQueryRepository {
     return user ? mapToUserOutput(user) : null
   }
 
-  private prepareFilterObj(fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>) {
+  public async getMe(id: string): Promise<UserMeOutput | null> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+    return user ? mapToMeUser(user) : null
+  }
+
+  private _prepareFilterObj(fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>) {
     const filterObj: Filter<User> = {}
     const orArray: Filter<User>[] = []
 

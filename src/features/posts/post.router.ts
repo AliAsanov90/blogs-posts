@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { HOME, ID } from '../../common/constants/routes'
-import { authGuardMiddleware } from '../../common/middleware/auth.middleware'
+import { basicAuthGuardMiddleware } from '../../common/middleware/basic-auth.middleware'
 import { idValidation } from '../../common/middleware/id-validation.middleware'
 import { getQueryValidation } from '../../common/middleware/query-validation.middleware'
 import { validationResultMiddleware } from '../../common/middleware/validation-result.middleware'
@@ -22,7 +22,7 @@ postRouter
 
   .post(
     HOME,
-    authGuardMiddleware,
+    basicAuthGuardMiddleware,
     postInputDtoValidation,
     validationResultMiddleware,
     postController.create,
@@ -30,11 +30,11 @@ postRouter
 
   .put(
     ID,
-    authGuardMiddleware,
+    basicAuthGuardMiddleware,
     idValidation,
     postInputDtoValidation,
     validationResultMiddleware,
     postController.update,
   )
 
-  .delete(ID, authGuardMiddleware, idValidation, validationResultMiddleware, postController.delete)
+  .delete(ID, basicAuthGuardMiddleware, idValidation, validationResultMiddleware, postController.delete)

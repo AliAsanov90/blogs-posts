@@ -15,12 +15,18 @@ class UserRepository {
     return !!deletedCount
   }
 
-  public async getUserExistsByLoginOrEmail(login: string, email: string): Promise<boolean> {
+  public async getUserExistsByLoginAndEmail(login: string, email: string): Promise<boolean> {
     const filter: Filter<User> = {
       $or: [{ login }, { email }],
     }
     const foundUsersCount = await usersCollection.countDocuments(filter)
     return !!foundUsersCount
+  }
+
+  public async findOneByLoginOrEmail(loginOrEmail: string): Promise<WithId<User> | null> {
+    return usersCollection.findOne({
+      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    })
   }
 
   public async getOneById(id: string): Promise<WithId<User> | null> {

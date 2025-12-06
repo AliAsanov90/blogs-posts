@@ -14,7 +14,7 @@ interface AuthTestManagerParams {
 }
 
 export const authTestManager = ({ app }: AuthTestManagerParams) => ({
-  login: async ({ data, status = HttpStatus.NoContent }: LoginParams) => {
+  login: async ({ data, status = HttpStatus.Ok }: LoginParams) => {
     return await request(app)
       .post(AUTH + LOGIN)
       .send(data)

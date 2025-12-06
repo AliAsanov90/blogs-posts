@@ -1,4 +1,5 @@
 import { Response } from 'express'
+import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken'
 import { BadRequestError, NotFoundError, UnauthorizedError } from '../types/errors.types'
 import { HttpStatus } from '../types/http-statuses.types'
 import { ErrorMessages, ValidationAppError } from '../types/validation-error.types'
@@ -19,17 +20,31 @@ const getErrorResponseObj = <T extends Error, K extends Response>(
   })
 }
 
+interface ErrorConstructorWithStatus {
+  new (...args: any[]): Error
+  httpStatus?: HttpStatus
+}
+
+const expectedErrorClasses = new Map<ErrorConstructorWithStatus, HttpStatus>([
+  [NotFoundError, NotFoundError.httpStatus],
+  [BadRequestError, BadRequestError.httpStatus],
+  [UnauthorizedError, UnauthorizedError.httpStatus],
+  [TokenExpiredError, HttpStatus.Unauthorized],
+  [JsonWebTokenError, HttpStatus.Unauthorized],
+  [NotBeforeError, HttpStatus.Unauthorized],
+])
+
 export const handleErrors = <K extends Response>(error: unknown, res: K) => {
-  if (error instanceof NotFoundError) {
-    return getErrorResponseObj(error, NotFoundError.httpStatus, res)
+  console.error(error)
+
+  for (const [ErrorClass, status] of expectedErrorClasses.entries()) {
+    if (error instanceof ErrorClass) {
+      return getErrorResponseObj(error, status, res)
+    }
   }
 
-  if (error instanceof BadRequestError) {
-    return getErrorResponseObj(error, BadRequestError.httpStatus, res)
-  }
-
-  if (error instanceof UnauthorizedError) {
-    return getErrorResponseObj(error, UnauthorizedError.httpStatus, res)
+  if (error instanceof Error) {
+    return getErrorResponseObj(error, HttpStatus.InternalServerError, res)
   }
 
   res.status(HttpStatus.InternalServerError).json({

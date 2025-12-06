@@ -1,4 +1,5 @@
 import { Collection, Db, MongoClient } from 'mongodb'
+import { checkEnvVariables } from '../common/utils/checkEnvVars.util'
 import { Blog } from '../features/blogs/types/blog.types'
 import { Post } from '../features/posts/types/post.types'
 import { User } from '../features/users/types/user.types'
@@ -16,9 +17,7 @@ export let postsCollection: Collection<Post>
 export let usersCollection: Collection<User>
 
 export const runDb = async (): Promise<void> => {
-  if (!DB_URL || !DB_NAME) {
-    throw new Error('Database URL or name is undefined')
-  }
+  checkEnvVariables(DB_URL, DB_NAME)
 
   try {
     client = new MongoClient(DB_URL)

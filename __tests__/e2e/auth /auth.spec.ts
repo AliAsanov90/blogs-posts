@@ -54,14 +54,20 @@ describe('Auth API', () => {
     it('Should authenticate with correct login and password', async () => {
       await userHelper.create({})
 
-      await authHelper.login({
+      const res = await authHelper.login({
         data: testLoginDataWithLogin,
+      })
+      expect(res.body).toEqual({
+        accessToken: expect.any(String)
       })
     })
 
     it('Should authenticate with correct email and password', async () => {
-      await authHelper.login({
+      const res = await authHelper.login({
         data: testLoginDataWithEmail,
+      })
+      expect(res.body).toEqual({
+        accessToken: expect.any(String)
       })
     })
 
