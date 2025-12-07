@@ -51,6 +51,10 @@ describe('Auth API', () => {
 
   // LOGIN
   describe('LOGIN endpoint; POST -> /auth/login', () => {
+    afterAll(async () => {
+      await clearDb(app)
+    })
+
     it('Should authenticate with correct login and password', async () => {
       await userHelper.create({})
 
@@ -58,7 +62,7 @@ describe('Auth API', () => {
         data: testLoginDataWithLogin,
       })
       expect(res.body).toEqual({
-        accessToken: expect.any(String)
+        accessToken: expect.any(String),
       })
     })
 
@@ -67,7 +71,7 @@ describe('Auth API', () => {
         data: testLoginDataWithEmail,
       })
       expect(res.body).toEqual({
-        accessToken: expect.any(String)
+        accessToken: expect.any(String),
       })
     })
 
@@ -82,6 +86,52 @@ describe('Auth API', () => {
       await authHelper.login({
         data: incorrectPassword,
         status: HttpStatus.Unauthorized,
+      })
+    })
+  })
+
+  // GET ME
+  describe('GET ME endpoint; GET -> /auth/me', () => {
+    afterAll(async () => {
+      await clearDb(app)
+    })
+
+    it('Should return authenticated user data', async () => {
+      const createUserRes = await userHelper.create({})
+
+      const loginRes = await authHelper.login({
+        data: testLoginDataWithLogin,
+      })
+      const getMeRes = await authHelper.getMe({
+        token: loginRes.body.accessToken,
+      })
+      expect(getMeRes.body).toEqual({
+        email: testUserData.email,
+        login: testUserData.login,
+        userId: createUserRes.body.id,
+      })
+    })
+
+    it('Should return "Unauthorized" error if user not authenticated', async () => {
+      await authHelper.getMe({
+        token: 'invalid-token',
+        status: HttpStatus.Unauthorized,
+      })
+    })
+
+    it('Should return "Unauthorized" error auth header absent', async () => {
+      await authHelper.getMe({
+        token: 'invalid-token',
+        status: HttpStatus.Unauthorized,
+        withAuthHeader: false
+      })
+    })
+
+    it('Should return "Unauthorized" error if "Bearer" absent', async () => {
+      await authHelper.getMe({
+        token: 'invalid-token',
+        status: HttpStatus.Unauthorized,
+        withAuthBearer: false
       })
     })
   })
