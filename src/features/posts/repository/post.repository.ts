@@ -3,10 +3,6 @@ import { postsCollection } from '../../../db/mongo.db'
 import { Post } from '../types/post.types'
 
 class PostRepository {
-  // public async getOne(id: string): Promise<WithId<Post> | null> {
-  //   return postsCollection.findOne({ _id: new ObjectId(id) })
-  // }
-
   public async create(post: Post): Promise<string> {
     const { insertedId } = await postsCollection.insertOne(post)
     return insertedId.toString()

@@ -12,6 +12,10 @@ export const POSTS_BY_BLOG_ID = '/:blogId/posts'
 
 // POSTS routes
 export const POSTS = '/posts'
+export const COMMENTS_BY_POST_ID = '/:postId/comments'
+
+// COMMENTS routes
+export const COMMENTS = '/comments'
 
 // USERS routes
 export const USERS = '/users'

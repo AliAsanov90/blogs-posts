@@ -27,4 +27,10 @@ userRouter
     userController.create,
   )
 
-  .delete(ID, basicAuthGuardMiddleware, idValidation, validationResultMiddleware, userController.delete)
+  .delete(
+    ID,
+    basicAuthGuardMiddleware,
+    idValidation,
+    validationResultMiddleware,
+    userController.delete,
+  )

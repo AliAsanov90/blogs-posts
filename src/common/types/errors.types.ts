@@ -11,3 +11,7 @@ export class BadRequestError extends Error {
 export class UnauthorizedError extends Error {
   static httpStatus = HttpStatus.Unauthorized
 }
+
+export class ForbiddenError extends Error {
+  static httpStatus = HttpStatus.Forbidden
+}

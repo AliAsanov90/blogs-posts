@@ -39,3 +39,14 @@ export type RequestWithBlogIdAndQuery<TSortByFields> = Request<
 }
 
 export type RequestWithBlogIdAndBody<TBody> = Request<{ blogId: string }, unknown, TBody>
+
+export type RequestWithPostIdAndQuery<TSortByFields> = Request<
+  { postId: string },
+  unknown,
+  unknown,
+  PaginationAndSorting<TSortByFields>
+> & {
+  sanitizedQuery: PaginationAndSorting<TSortByFields>
+}
+
+export type RequestWithPostIdAndBody<TBody> = Request<{ postId: string }, unknown, TBody>

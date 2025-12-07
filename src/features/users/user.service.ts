@@ -33,7 +33,7 @@ class UserService {
     }
   }
 
-  private async getExistingUserOrThrow(id: string) {
+  public async getExistingUserOrThrow(id: string) {
     const user = await userRepository.getOneById(id)
 
     if (!user) {

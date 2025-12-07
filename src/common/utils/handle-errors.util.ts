@@ -1,6 +1,11 @@
 import { Response } from 'express'
 import { JsonWebTokenError, NotBeforeError, TokenExpiredError } from 'jsonwebtoken'
-import { BadRequestError, NotFoundError, UnauthorizedError } from '../types/errors.types'
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../types/errors.types'
 import { HttpStatus } from '../types/http-statuses.types'
 import { ErrorMessages, ValidationAppError } from '../types/validation-error.types'
 
@@ -26,9 +31,12 @@ interface ErrorConstructorWithStatus {
 }
 
 const expectedErrorClasses = new Map<ErrorConstructorWithStatus, HttpStatus>([
+  // Custom errors
   [NotFoundError, NotFoundError.httpStatus],
   [BadRequestError, BadRequestError.httpStatus],
   [UnauthorizedError, UnauthorizedError.httpStatus],
+  [ForbiddenError, ForbiddenError.httpStatus],
+  // JWT errors
   [TokenExpiredError, HttpStatus.Unauthorized],
   [JsonWebTokenError, HttpStatus.Unauthorized],
   [NotBeforeError, HttpStatus.Unauthorized],
