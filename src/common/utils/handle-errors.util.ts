@@ -55,7 +55,7 @@ export const handleErrors = <K extends Response>(error: unknown, res: K) => {
     return getErrorResponseObj(error, HttpStatus.InternalServerError, res)
   }
 
-  res.status(HttpStatus.InternalServerError).json({
+  return res.status(HttpStatus.InternalServerError).json({
     message: 'Something went wrong...',
     status: HttpStatus.InternalServerError,
     error,

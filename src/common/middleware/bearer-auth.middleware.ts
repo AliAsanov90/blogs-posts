@@ -19,9 +19,9 @@ export const bearerAuthGuardMiddleware = (req: Request, res: Response, next: Nex
 
   const jwtPayload = verifyJwtToken(token, res)
 
-  if (jwtPayload) {
-    req.userId = jwtPayload.userId
-  }
+  if (!jwtPayload) return
+
+  req.userId = jwtPayload.userId
 
   next()
 }
