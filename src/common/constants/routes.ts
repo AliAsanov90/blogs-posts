@@ -16,6 +16,7 @@ export const COMMENTS_BY_POST_ID = '/:postId/comments'
 
 // COMMENTS routes
 export const COMMENTS = '/comments'
+export const COMMENT_ID = '/:commentId'
 
 // USERS routes
 export const USERS = '/users'

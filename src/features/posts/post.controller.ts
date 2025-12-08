@@ -4,8 +4,7 @@ import {
   RequestWithBody,
   RequestWithId,
   RequestWithIdAndBody,
-  RequestWithPostIdAndBody,
-  RequestWithPostIdAndQuery,
+  RequestWithIdAndQuery,
   RequestWithQuery,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
@@ -54,7 +53,7 @@ class PostController {
   })
 
   public getCommentsByPostId = catchAsync(
-    async (req: RequestWithPostIdAndQuery<CommentSortByFields>, res: Response) => {
+    async (req: RequestWithIdAndQuery<CommentSortByFields, 'postId'>, res: Response) => {
       const queryInput = setDefaultSortAndPagination<CommentQueryInput>(req.sanitizedQuery)
 
       const result = await postService.getCommentsByPostId(queryInput, req.params.postId)
@@ -64,7 +63,7 @@ class PostController {
   )
 
   public createCommentByPostId = catchAsync(
-    async (req: RequestWithPostIdAndBody<CommentInput>, res: Response) => {
+    async (req: RequestWithIdAndBody<CommentInput, 'postId'>, res: Response) => {
       const createdCommentId = await postService.createCommentByPostId(
         req.body,
         req.params.postId,

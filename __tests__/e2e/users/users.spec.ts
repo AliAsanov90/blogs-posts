@@ -1,9 +1,8 @@
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
-import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { UserInput, UserOutput } from '../../../src/features/users/types/user.types'
 import { setupApp } from '../../../src/setupApp'
-import { clearDb } from '../../utils/clearDb.util'
+import { clearDb } from '../../utils/test-helpers.util'
 import { usersTestManager } from '../../utils/users.util'
 
 const testUserData: UserInput = {
@@ -26,8 +25,7 @@ const incorrectTestUserData: UserInput = {
 
 describe('Users API', () => {
   const app = setupApp()
-  const { authToken } = generateAuthToken()
-  const userHelper = usersTestManager({ app, authToken })
+  const userHelper = usersTestManager(app)
 
   beforeAll(async () => {
     await runDb()

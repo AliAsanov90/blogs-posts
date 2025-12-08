@@ -7,17 +7,13 @@ import {
   PaginationAndSorting,
 } from '../../src/common/middleware/query-validation.middleware'
 import { HttpStatus } from '../../src/common/types/http-statuses.types'
+import { generateAuthToken } from '../../src/common/utils/generate-auth-token'
 import {
   BlogInput,
   BlogQueryInput,
   BlogSortByFields,
 } from '../../src/features/blogs/types/blog.types'
 import { PostInput } from '../../src/features/posts/types/post.types'
-
-interface BlogsTestManagerParams {
-  app: Application
-  authToken: string
-}
 
 type CommonParams = {
   status?: HttpStatus
@@ -37,7 +33,7 @@ type DeleteParams = CommonParams & {
 }
 
 type CreateParams = CommonParams & {
-  data: BlogInput
+  data?: Partial<BlogInput>
   token?: string
 }
 
@@ -58,9 +54,17 @@ type CreatePostByBlogIdParams = CommonParams & {
   token?: string
 }
 
+const defaultTestData: BlogInput = {
+  name: 'Test name',
+  description: 'Test description',
+  websiteUrl: 'https://website-url.com',
+}
+
 const defaultQuery = defaultSortPaginationValues as PaginationAndSorting<BlogSortByFields>
 
-export const blogsTestManager = ({ app, authToken }: BlogsTestManagerParams) => ({
+const { authToken } = generateAuthToken()
+
+export const blogsTestManager = (app: Application) => ({
   getAll: async ({ query, status = HttpStatus.Ok }: GetAllParams) => {
     const queryParams = { ...defaultQuery, ...query }
     return await request(app).get(BLOGS).query(queryParams).expect(status)
@@ -72,15 +76,15 @@ export const blogsTestManager = ({ app, authToken }: BlogsTestManagerParams) => 
       .expect(status)
   },
 
-  create: async ({ token = '', data, status = HttpStatus.Created }: CreateParams) => {
+  create: async ({ token, data = {}, status = HttpStatus.Created }: CreateParams) => {
     return await request(app)
       .post(BLOGS)
       .set(AUTH_HEADER_NAME, token ?? authToken)
-      .send(data)
+      .send({ ...defaultTestData, ...data })
       .expect(status)
   },
 
-  update: async ({ token = '', data, id, status = HttpStatus.NoContent }: UpdateParams) => {
+  update: async ({ token, data, id, status = HttpStatus.NoContent }: UpdateParams) => {
     return await request(app)
       .put(BLOGS + `/${id}`)
       .set(AUTH_HEADER_NAME, token ?? authToken)
@@ -88,7 +92,7 @@ export const blogsTestManager = ({ app, authToken }: BlogsTestManagerParams) => 
       .expect(status)
   },
 
-  delete: async ({ token = '', id, status = HttpStatus.NoContent }: DeleteParams) => {
+  delete: async ({ token, id, status = HttpStatus.NoContent }: DeleteParams) => {
     return await request(app)
       .delete(BLOGS + `/${id}`)
       .set(AUTH_HEADER_NAME, token ?? authToken)
@@ -105,7 +109,7 @@ export const blogsTestManager = ({ app, authToken }: BlogsTestManagerParams) => 
   },
 
   createPostByBlogId: async ({
-    token = '',
+    token,
     blogId,
     data,
     status = HttpStatus.Created,

@@ -4,6 +4,7 @@ import { AUTH_HEADER_NAME } from '../../src/common/constants/common'
 import { AUTH, LOGIN, ME } from '../../src/common/constants/routes'
 import { HttpStatus } from '../../src/common/types/http-statuses.types'
 import { LoginInput } from '../../src/features/auth/types/auth.types'
+import { formatBearerToken } from './test-helpers.util'
 
 type LoginParams = {
   data: LoginInput
@@ -17,11 +18,7 @@ type GetMeParams = {
   withAuthBearer?: boolean
 }
 
-interface AuthTestManagerParams {
-  app: Application
-}
-
-export const authTestManager = ({ app }: AuthTestManagerParams) => ({
+export const authTestManager = (app: Application) => ({
   login: async ({ data, status = HttpStatus.Ok }: LoginParams) => {
     return await request(app)
       .post(AUTH + LOGIN)
@@ -43,11 +40,7 @@ export const authTestManager = ({ app }: AuthTestManagerParams) => ({
 
     return await request(app)
       .get(AUTH + ME)
-      .set(AUTH_HEADER_NAME, withAuthBearer ? formatWithBearer(token) : token)
+      .set(AUTH_HEADER_NAME, withAuthBearer ? formatBearerToken(token) : token)
       .expect(status)
   },
 })
-
-function formatWithBearer(token: string) {
-  return `Bearer ${token}`
-}

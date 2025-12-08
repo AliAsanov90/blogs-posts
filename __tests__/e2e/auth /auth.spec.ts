@@ -1,11 +1,10 @@
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
-import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
 import { LoginInput } from '../../../src/features/auth/types/auth.types'
-import { UserInput } from '../../../src/features/users/types/user.types'
+import { UserInput, UserOutput } from '../../../src/features/users/types/user.types'
 import { setupApp } from '../../../src/setupApp'
 import { authTestManager } from '../../utils/auth.util'
-import { clearDb } from '../../utils/clearDb.util'
+import { clearDb, createTestData } from '../../utils/test-helpers.util'
 import { usersTestManager } from '../../utils/users.util'
 
 const testUserData: UserInput = {
@@ -36,14 +35,12 @@ const incorrectPassword: LoginInput = {
 
 describe('Auth API', () => {
   const app = setupApp()
-  const { authToken } = generateAuthToken()
-  const userHelper = usersTestManager({ app, authToken })
-  const authHelper = authTestManager({ app })
+  const userHelper = usersTestManager(app)
+  const authHelper = authTestManager(app)
 
   beforeAll(async () => {
     await runDb()
   })
-
   afterAll(async () => {
     await clearDb(app)
     closeDb()
@@ -92,23 +89,24 @@ describe('Auth API', () => {
 
   // GET ME
   describe('GET ME endpoint; GET -> /auth/me', () => {
+    let createdUser: UserOutput
+    let accessToken: string
+
+    beforeAll(async () => {
+      const { user, userAccessToken } = await createTestData(app)
+      createdUser = user
+      accessToken = userAccessToken
+    })
     afterAll(async () => {
       await clearDb(app)
     })
 
     it('Should return authenticated user data', async () => {
-      const createUserRes = await userHelper.create({})
-
-      const loginRes = await authHelper.login({
-        data: testLoginDataWithLogin,
-      })
-      const getMeRes = await authHelper.getMe({
-        token: loginRes.body.accessToken,
-      })
+      const getMeRes = await authHelper.getMe({ token: accessToken })
       expect(getMeRes.body).toEqual({
-        email: testUserData.email,
-        login: testUserData.login,
-        userId: createUserRes.body.id,
+        email: createdUser.email,
+        login: createdUser.login,
+        userId: createdUser.id,
       })
     })
 
@@ -123,7 +121,7 @@ describe('Auth API', () => {
       await authHelper.getMe({
         token: 'invalid-token',
         status: HttpStatus.Unauthorized,
-        withAuthHeader: false
+        withAuthHeader: false,
       })
     })
 
@@ -131,7 +129,7 @@ describe('Auth API', () => {
       await authHelper.getMe({
         token: 'invalid-token',
         status: HttpStatus.Unauthorized,
-        withAuthBearer: false
+        withAuthBearer: false,
       })
     })
   })

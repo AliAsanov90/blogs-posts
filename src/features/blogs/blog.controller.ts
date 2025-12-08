@@ -1,11 +1,10 @@
 import { Response } from 'express'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
-  RequestWithBlogIdAndBody,
-  RequestWithBlogIdAndQuery,
   RequestWithBody,
   RequestWithId,
   RequestWithIdAndBody,
+  RequestWithIdAndQuery,
   RequestWithQuery,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
@@ -39,7 +38,7 @@ class BlogController {
   })
 
   public getPostsByBlogId = catchAsync(
-    async (req: RequestWithBlogIdAndQuery<PostSortByFields>, res: Response) => {
+    async (req: RequestWithIdAndQuery<PostSortByFields, 'blogId'>, res: Response) => {
       const queryInput = setDefaultSortAndPagination<PostQueryInput>(req.sanitizedQuery)
 
       const result = await blogService.getPostsByBlogId(queryInput, req.params.blogId)
@@ -49,7 +48,7 @@ class BlogController {
   )
 
   public createPostByBlogId = catchAsync(
-    async (req: RequestWithBlogIdAndBody<Omit<PostInput, 'blogId'>>, res: Response) => {
+    async (req: RequestWithIdAndBody<Omit<PostInput, 'blogId'>, 'blogId'>, res: Response) => {
       const inputData: PostInput = { ...req.body, blogId: req.params.blogId }
 
       const createdPostId = await blogService.createPostByBlogId(inputData)

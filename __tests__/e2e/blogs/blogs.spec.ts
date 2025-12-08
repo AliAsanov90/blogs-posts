@@ -5,8 +5,8 @@ import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.ty
 import { PostInput } from '../../../src/features/posts/types/post.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
-import { clearDb } from '../../utils/clearDb.util'
 import { postsTestManager } from '../../utils/posts.util'
+import { clearDb } from '../../utils/test-helpers.util'
 
 const testBlogData: BlogInput = {
   name: 'Test name',
@@ -37,8 +37,8 @@ let createdBlog: BlogOutput
 describe('Blogs API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
-  const blogHelper = blogsTestManager({ app, authToken })
-  const postHelper = postsTestManager({ app, authToken })
+  const blogHelper = blogsTestManager(app)
+  const postHelper = postsTestManager(app)
 
   beforeAll(async () => {
     await runDb()
@@ -67,7 +67,7 @@ describe('Blogs API', () => {
 
   it('Should not create a blog without auth header; POST /blogs', async () => {
     await blogHelper.create({
-      token: undefined,
+      token: '',
       data: testBlogData,
       status: HttpStatus.Unauthorized,
     })

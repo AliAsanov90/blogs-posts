@@ -13,14 +13,16 @@ class CommentController {
     return comment ? res.status(HttpStatus.Ok).send(comment) : res.sendStatus(HttpStatus.NotFound)
   })
 
-  public update = catchAsync(async (req: RequestWithIdAndBody<CommentInput>, res: Response) => {
-    const isUpdated = await commentService.update(req.params.id, req.body, req.userId)
+  public update = catchAsync(
+    async (req: RequestWithIdAndBody<CommentInput, 'commentId'>, res: Response) => {
+      const isUpdated = await commentService.update(req.params.commentId, req.body, req.userId)
 
-    return isUpdated ? res.sendStatus(HttpStatus.NoContent) : res.sendStatus(HttpStatus.NotFound)
-  })
+      return isUpdated ? res.sendStatus(HttpStatus.NoContent) : res.sendStatus(HttpStatus.NotFound)
+    },
+  )
 
-  public delete = catchAsync(async (req: RequestWithId, res: Response) => {
-    const isDeleted = await commentService.delete(req.params.id, req.userId)
+  public delete = catchAsync(async (req: RequestWithId<'commentId'>, res: Response) => {
+    const isDeleted = await commentService.delete(req.params.commentId, req.userId)
 
     return isDeleted ? res.sendStatus(HttpStatus.NoContent) : res.sendStatus(HttpStatus.NotFound)
   })
