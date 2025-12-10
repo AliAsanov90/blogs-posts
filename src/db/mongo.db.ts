@@ -7,8 +7,8 @@ import { User } from '../features/users/types/user.types'
 
 const DB_URL = process.env.MONGO_URL
 const DB_NAME = process.env.MONGO_DB_NAME
-const DB_USERNAME = process.env.MONGO_DB_USERNAME
-const DB_PASSWORD = process.env.MONGO_DB_PASSWORD
+const DB_USERNAME = process.env.MONGO_INITDB_ROOT_USERNAME
+const DB_PASSWORD = process.env.MONGO_INITDB_ROOT_PASSWORD
 
 const BLOGS_COLLECTION_NAME = 'blogs'
 const POSTS_COLLECTION_NAME = 'posts'
@@ -27,8 +27,8 @@ export const runDb = async (): Promise<void> => {
   try {
     client = new MongoClient(DB_URL, {
       auth: {
-        username: DB_USERNAME,
-        password: DB_PASSWORD,
+        username: DB_USERNAME ?? '',
+        password: DB_PASSWORD ?? '',
       },
     })
 

@@ -11,7 +11,14 @@ export default defineConfig([
   // 1. ESLint config files should NOT be type-checked
   // ───────────────────────────────────────────────
   {
-    files: ['eslint.config.*', '*.config.*', '*.config.*.cjs', '*.config.*.mjs'],
+    files: [
+      'eslint.config.*',
+      '*.config.*',
+      '*.config.*.cjs',
+      '*.config.*.mjs',
+      // 'docker-compose.yml',
+      // 'Dockerfile'
+    ],
     languageOptions: {
       parserOptions: {
         project: null, // disable type-aware linting for config
