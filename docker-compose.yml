@@ -17,22 +17,21 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      - .:/app # mount local code
-      - /app/node_modules # avoid overwriting node_modules
+      - .:/app
+      - /app/node_modules
     command: npm run dev:watch
     ports:
       - 5001:5001
+      - 9229:9229
     networks:
       - blogs
     env_file:
       - ".env"
     depends_on:
-      mongodb:
-        condition: service_started
+      - mongodb
 
 networks:
   blogs:
-    driver: bridge
 
 volumes:
   mongodata:
