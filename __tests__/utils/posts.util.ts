@@ -2,67 +2,117 @@ import { Application } from 'express'
 import request from 'supertest'
 import { AUTH_HEADER_NAME } from '../../src/common/constants/common'
 import { POSTS } from '../../src/common/constants/routes'
-import { defaultSortPaginationValues, PaginationAndSorting } from '../../src/common/middleware/query-validation.middleware'
+import { defaultSortPaginationValues } from '../../src/common/middleware/query-validation.middleware'
 import { HttpStatus } from '../../src/common/types/http-statuses.types'
-import { PostInput, PostQueryInput, PostSortByFields } from '../../src/features/posts/types/post.types'
+import { generateAuthToken } from '../../src/common/utils/generate-auth-token'
+import { CommentInput } from '../../src/features/comments/types/comment.types'
+import { PostInput, PostQueryInput } from '../../src/features/posts/types/post.types'
+import { formatBearerToken, getCommentsRoute } from './test-helpers.util'
 
-type GetAllParams = {
-  app: Application
-  httpStatus?: HttpStatus
+type CommonParams = {
+  status?: HttpStatus
+}
+
+type GetAllParams = CommonParams & {
   query?: Partial<PostQueryInput>
 }
 
-type GetOneParams = GetAllParams & {
+type GetOneParams = CommonParams & {
   id: string
+  query?: Partial<PostQueryInput>
 }
 
-type DeleteParams = GetOneParams & {
+type CreateParams = CommonParams & {
   token?: string
+  query?: Partial<PostQueryInput>
+  data?: Partial<PostInput>
 }
 
-type CreateParams = GetAllParams & {
+type UpdateParams = CommonParams & {
+  id: string
+  token?: string
   data: Partial<PostInput>
+}
+
+type DeleteParams = CommonParams & {
+  id: string
   token?: string
 }
 
-type UpdateParams = CreateParams & {
-  id: string
+type GetAllCommentsParams = CommonParams & {
+  postId: string
+  query?: Partial<PostQueryInput>
 }
 
-const defaultQuery = defaultSortPaginationValues as PaginationAndSorting<PostSortByFields>
+type CreateCommentParams = CommonParams & {
+  token: string
+  postId: string
+  data?: Partial<CommentInput>
+}
 
-export const postsTestManager = {
-  getAll: async ({ app, query, httpStatus = HttpStatus.Ok }: GetAllParams) => {
-    const queryParams = { ...defaultQuery, ...query }
+const defaultTestData: PostInput = {
+  title: 'Test title',
+  shortDescription: 'Test short description',
+  content: 'Test content',
+  blogId: '691fe02e62d2354296c74857',
+}
 
-    return await request(app)
-      .get(POSTS)
-      .query(queryParams)
-      .expect(httpStatus)
+const defaultCommentInputData: CommentInput = {
+  content: 'some comment that must be at least 20 chars long',
+}
+
+const { authToken } = generateAuthToken()
+
+export const postsTestManager = (app: Application) => ({
+  getAll: async ({ query, status = HttpStatus.Ok }: GetAllParams) => {
+    const queryParams = { ...defaultSortPaginationValues, ...query }
+    return await request(app).get(POSTS).query(queryParams).expect(status)
   },
-  getOne: async ({ app, id, httpStatus = HttpStatus.Ok }: GetOneParams) => {
+
+  getOne: async ({ id, status = HttpStatus.Ok }: GetOneParams) => {
     return await request(app)
       .get(POSTS + `/${id}`)
-      .expect(httpStatus)
+      .expect(status)
   },
-  create: async ({ app, token = '', data, httpStatus = HttpStatus.Created }: CreateParams) => {
+
+  create: async ({ token, data = {}, status = HttpStatus.Created }: CreateParams) => {
     return await request(app)
       .post(POSTS)
-      .set(AUTH_HEADER_NAME, token)
-      .send(data)
-      .expect(httpStatus)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .send({ ...defaultTestData, ...data })
+      .expect(status)
   },
-  update: async ({ app, token= '', data, id, httpStatus = HttpStatus.NoContent }: UpdateParams) => {
+
+  update: async ({ token, data, id, status = HttpStatus.NoContent }: UpdateParams) => {
     return await request(app)
       .put(POSTS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
       .send(data)
-      .expect(httpStatus)
+      .expect(status)
   },
-  delete: async ({ app, token = '', id, httpStatus = HttpStatus.NoContent }: DeleteParams) => {
+
+  delete: async ({ token, id, status = HttpStatus.NoContent }: DeleteParams) => {
     return await request(app)
       .delete(POSTS + `/${id}`)
-      .set(AUTH_HEADER_NAME, token)
-      .expect(httpStatus)
+      .set(AUTH_HEADER_NAME, token ?? authToken)
+      .expect(status)
   },
-}
+
+  getAllComments: async ({ postId, query, status = HttpStatus.Ok }: GetAllCommentsParams) => {
+    const queryParams = { ...defaultSortPaginationValues, ...query }
+    return await request(app).get(getCommentsRoute(postId)).query(queryParams).expect(status)
+  },
+
+  createComment: async ({
+    token,
+    postId,
+    data = {},
+    status = HttpStatus.Created,
+  }: CreateCommentParams) => {
+    return await request(app)
+      .post(getCommentsRoute(postId))
+      .set(AUTH_HEADER_NAME, formatBearerToken(token))
+      .send({ ...defaultCommentInputData, ...data })
+      .expect(status)
+  },
+})

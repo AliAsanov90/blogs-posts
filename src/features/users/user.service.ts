@@ -8,7 +8,7 @@ class UserService {
   public async create(inputData: UserInput) {
     const { login, password, email } = inputData
 
-    await this.checkUserLoginEmailExists(login, email)
+    await this._checkUserLoginEmailExists(login, email)
 
     const hashedPassword = await bcryptService.createHash(password)
 
@@ -26,21 +26,18 @@ class UserService {
     return await userRepository.delete(id)
   }
 
-  private async checkUserLoginEmailExists(login: string, email: string) {
-    const userExists = await userRepository.getUserExistsByLoginOrEmail(
-      login,
-      email,
-    )
+  private async _checkUserLoginEmailExists(login: string, email: string) {
+    const userExists = await userRepository.getUserExistsByLoginAndEmail(login, email)
     if (userExists) {
-      throw new BadRequestError(Messages.UserEmailOrLoginExists)
+      throw new BadRequestError(Messages.user.emailOrLoginExists)
     }
   }
 
-  private async getExistingUserOrThrow(id: string) {
+  public async getExistingUserOrThrow(id: string) {
     const user = await userRepository.getOneById(id)
 
     if (!user) {
-      throw new NotFoundError(Messages.UserNotFound)
+      throw new NotFoundError(Messages.user.notFound)
     }
     return user
   }

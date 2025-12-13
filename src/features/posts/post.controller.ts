@@ -4,67 +4,76 @@ import {
   RequestWithBody,
   RequestWithId,
   RequestWithIdAndBody,
+  RequestWithIdAndQuery,
   RequestWithQuery,
 } from '../../common/types/request-response.types'
 import { catchAsync } from '../../common/utils/catch-async.util'
 import { setDefaultSortAndPagination } from '../../common/utils/set-default-sort-pagination.util'
+import { commentQueryRepository } from '../comments/repository/comment-query.repository'
+import {
+  CommentInput,
+  CommentQueryInput,
+  CommentSortByFields,
+} from '../comments/types/comment.types'
 import { postService } from './post.service'
 import { postQueryRepository } from './repository/post-query.repository'
 import { PostInput, PostQueryInput, PostSortByFields } from './types/post.types'
-import {
-  mapToPostOutput,
-  mapToPostsPaginatedOutput,
-} from './utils/post-output.mapper'
 
 class PostController {
-  public getAll = catchAsync(
-    async (req: RequestWithQuery<PostSortByFields>, res: Response) => {
-      const queryInput = setDefaultSortAndPagination<PostQueryInput>(
-        req.sanitizedQuery,
-      )
+  public getAll = catchAsync(async (req: RequestWithQuery<PostSortByFields>, res: Response) => {
+    const queryInput = setDefaultSortAndPagination<PostQueryInput>(req.sanitizedQuery)
+    const result = await postQueryRepository.findMany(queryInput)
 
-      const { items, totalCount } = await postService.getAll(queryInput)
-
-      res
-        .status(HttpStatus.Ok)
-        .send(mapToPostsPaginatedOutput(items, totalCount, queryInput))
-    },
-  )
-
-  public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
-    const post = await postService.getOne(req.params.id)
-
-    return post
-      ? res.status(HttpStatus.Ok).send(mapToPostOutput(post))
-      : res.sendStatus(HttpStatus.NotFound)
+    res.status(HttpStatus.Ok).send(result)
   })
 
-  public create = catchAsync(
-    async (req: RequestWithBody<PostInput>, res: Response) => {
-      const createdPostId = await postService.create(req.body)
-      const post = await postQueryRepository.findById(createdPostId)
+  public getOne = catchAsync(async (req: RequestWithId, res: Response) => {
+    const post = await postQueryRepository.findById(req.params.id)
 
-      res.status(HttpStatus.Created).send(mapToPostOutput(post!))
-    },
-  )
+    return post ? res.status(HttpStatus.Ok).send(post) : res.sendStatus(HttpStatus.NotFound)
+  })
 
-  public update = catchAsync(
-    async (req: RequestWithIdAndBody<PostInput>, res: Response) => {
-      const isUpdated = await postService.update(req.params.id, req.body)
+  public create = catchAsync(async (req: RequestWithBody<PostInput>, res: Response) => {
+    const createdPostId = await postService.create(req.body)
+    const post = await postQueryRepository.findById(createdPostId)
 
-      return isUpdated
-        ? res.sendStatus(HttpStatus.NoContent)
-        : res.sendStatus(HttpStatus.NotFound)
-    },
-  )
+    res.status(HttpStatus.Created).send(post)
+  })
+
+  public update = catchAsync(async (req: RequestWithIdAndBody<PostInput>, res: Response) => {
+    const isUpdated = await postService.update(req.params.id, req.body)
+
+    return isUpdated ? res.sendStatus(HttpStatus.NoContent) : res.sendStatus(HttpStatus.NotFound)
+  })
 
   public delete = catchAsync(async (req: RequestWithId, res: Response) => {
     const isDeleted = await postService.delete(req.params.id)
 
-    return isDeleted
-      ? res.sendStatus(HttpStatus.NoContent)
-      : res.sendStatus(HttpStatus.NotFound)
+    return isDeleted ? res.sendStatus(HttpStatus.NoContent) : res.sendStatus(HttpStatus.NotFound)
   })
+
+  public getCommentsByPostId = catchAsync(
+    async (req: RequestWithIdAndQuery<CommentSortByFields, 'postId'>, res: Response) => {
+      const queryInput = setDefaultSortAndPagination<CommentQueryInput>(req.sanitizedQuery)
+
+      const result = await postService.getCommentsByPostId(queryInput, req.params.postId)
+
+      res.status(HttpStatus.Ok).send(result)
+    },
+  )
+
+  public createCommentByPostId = catchAsync(
+    async (req: RequestWithIdAndBody<CommentInput, 'postId'>, res: Response) => {
+      const createdCommentId = await postService.createCommentByPostId(
+        req.body,
+        req.params.postId,
+        req.userId,
+      )
+      const comment = await commentQueryRepository.findById(createdCommentId)
+
+      res.status(HttpStatus.Created).send(comment)
+    },
+  )
 }
 
 export const postController = new PostController()

@@ -3,16 +3,39 @@ import { BlogSearchQueryFields } from '../../features/blogs/types/blog.types'
 import { UserSearchQueryFields } from '../../features/users/types/user.types'
 import { PaginationAndSorting } from '../middleware/query-validation.middleware'
 
-export type RequestWithId = Request<{ id: string }>
+// Id params
+type IdParam = 'id' | 'postId' | 'blogId' | 'commentId'
 
-export type RequestWithSanitizedQuery = Request & {
-  sanitizedQuery?: Record<string, unknown>
+// Query search fields
+export const SearchQueryFields = {
+  ...BlogSearchQueryFields,
+  ...UserSearchQueryFields,
+} as const
+
+export type TSearchQueryFieldKeys = keyof typeof SearchQueryFields
+
+// Request with id param
+export type RequestWithId<TParamKey extends IdParam = 'id'> = Request<{ [K in TParamKey]: string }>
+
+// Request with id param and body
+export type RequestWithIdAndBody<TBody, TParamKey extends IdParam = 'id'> = Request<
+  { [K in TParamKey]: string },
+  unknown,
+  TBody
+>
+
+// Request with id param and query
+export type RequestWithIdAndQuery<TSortByFields, TParamKey extends IdParam = 'id'> = Request<
+  { [K in TParamKey]: string },
+  unknown,
+  unknown,
+  PaginationAndSorting<TSortByFields>
+> & {
+  sanitizedQuery: PaginationAndSorting<TSortByFields>
 }
 
-export type RequestWithQuery<
-  TSortByFields,
-  TSearchQueryFields = never,
-> = Request<
+// Request with query
+export type RequestWithQuery<TSortByFields, TSearchQueryFields = never> = Request<
   unknown,
   unknown,
   unknown,
@@ -21,32 +44,9 @@ export type RequestWithQuery<
   sanitizedQuery: PaginationAndSorting<TSortByFields> & TSearchQueryFields
 }
 
-export const SearchQueryFields = {
-  ...BlogSearchQueryFields,
-  ...UserSearchQueryFields,
-} as const
-
-export type TSearchQueryFieldKeys = keyof typeof SearchQueryFields
-
-export type RequestWithBody<TBody> = Request<unknown, unknown, TBody>
-
-export type RequestWithIdAndBody<TBody> = Request<
-  { id: string },
-  unknown,
-  TBody
->
-
-export type RequestWithBlogIdAndQuery<TSortByFields> = Request<
-  { blogId: string },
-  unknown,
-  unknown,
-  PaginationAndSorting<TSortByFields>
-> & {
-  sanitizedQuery: PaginationAndSorting<TSortByFields>
+export type RequestWithSanitizedQuery = Request & {
+  sanitizedQuery?: Record<string, unknown>
 }
 
-export type RequestWithBlogIdAndBody<TBody> = Request<
-  { blogId: string },
-  unknown,
-  TBody
->
+// Request with body
+export type RequestWithBody<TBody> = Request<unknown, unknown, TBody>

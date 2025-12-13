@@ -37,8 +37,4 @@ const emailValidation = body('email')
   .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
   .withMessage('email does not match specific pattern')
 
-export const userInputValidation = [
-  loginValidation,
-  passwordValidation,
-  emailValidation,
-]
+export const userInputValidation = [loginValidation, passwordValidation, emailValidation]

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { HOME, ID } from '../../common/constants/routes'
-import { authGuardMiddleware } from '../../common/middleware/auth.middleware'
+import { basicAuthGuardMiddleware } from '../../common/middleware/basic-auth.middleware'
 import { idValidation } from '../../common/middleware/id-validation.middleware'
 import { getQueryValidation } from '../../common/middleware/query-validation.middleware'
 import { validationResultMiddleware } from '../../common/middleware/validation-result.middleware'
@@ -13,7 +13,7 @@ export const userRouter: Router = Router()
 userRouter
   .get(
     HOME,
-    authGuardMiddleware,
+    basicAuthGuardMiddleware,
     getQueryValidation(UserSortByFields, UserSearchQueryFields),
     validationResultMiddleware,
     userController.getAll,
@@ -21,7 +21,7 @@ userRouter
 
   .post(
     HOME,
-    authGuardMiddleware,
+    basicAuthGuardMiddleware,
     userInputValidation,
     validationResultMiddleware,
     userController.create,
@@ -29,7 +29,7 @@ userRouter
 
   .delete(
     ID,
-    authGuardMiddleware,
+    basicAuthGuardMiddleware,
     idValidation,
     validationResultMiddleware,
     userController.delete,

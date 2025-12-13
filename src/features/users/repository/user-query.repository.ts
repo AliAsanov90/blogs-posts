@@ -1,24 +1,22 @@
-import { Filter, ObjectId, WithId } from 'mongodb'
-import { QueryResult } from '../../../common/types/query-result-output.types'
+import { Filter, ObjectId } from 'mongodb'
+import { PaginatedOutput } from '../../../common/types/query-result-output.types'
 import { usersCollection } from '../../../db/mongo.db'
-import { User, UserQueryInput } from '../types/user.types'
+import { User, UserMeOutput, UserOutput, UserQueryInput } from '../types/user.types'
+import {
+  mapToMeUser,
+  mapToUserOutput,
+  mapToUsersPaginatedOutput,
+} from '../utils/user-output.mapper'
 
 type UserSearchFieldKeys = keyof Pick<User, 'login' | 'email'>
 
 class UserQueryRepository {
-  public async findMany(query: UserQueryInput): Promise<QueryResult<User>> {
-    const {
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-      searchEmailTerm,
-      searchLoginTerm,
-    } = query
+  public async findMany(query: UserQueryInput): Promise<PaginatedOutput<UserOutput>> {
+    const { pageNumber, pageSize, sortBy, sortDirection, searchEmailTerm, searchLoginTerm } = query
 
     const skip = (pageNumber - 1) * pageSize
 
-    const filter = this.prepareFilterObj({
+    const filter = this._prepareFilterObj({
       email: searchEmailTerm,
       login: searchLoginTerm,
     })
@@ -32,16 +30,20 @@ class UserQueryRepository {
 
     const totalCount = await usersCollection.countDocuments(filter)
 
-    return { items, totalCount }
+    return mapToUsersPaginatedOutput(items, totalCount, query)
   }
 
-  public async findById(id: string): Promise<WithId<User> | null> {
-    return usersCollection.findOne({ _id: new ObjectId(id) })
+  public async findById(id: string): Promise<UserOutput | null> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+    return user ? mapToUserOutput(user) : null
   }
 
-  private prepareFilterObj(
-    fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>,
-  ) {
+  public async getMe(id: string): Promise<UserMeOutput | null> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) })
+    return user ? mapToMeUser(user) : null
+  }
+
+  private _prepareFilterObj(fieldValuesMap: Record<UserSearchFieldKeys, string | undefined>) {
     const filterObj: Filter<User> = {}
     const orArray: Filter<User>[] = []
 

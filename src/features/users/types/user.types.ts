@@ -6,12 +6,24 @@ export type UserInput = {
   email: string
 }
 
-export type User = UserInput & {
+export type User = {
+  login: string
+  password: string
+  email: string
   createdAt: Date
 }
 
-export type UserOutput = Omit<User, 'password'> & {
+export type UserOutput = {
   id: string
+  login: string
+  email: string
+  createdAt: Date
+}
+
+export type UserMeOutput = {
+  email: string
+  login: string
+  userId: string
 }
 
 export enum UserSortByFields {

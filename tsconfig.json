@@ -8,11 +8,11 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
+    // "moduleResolution": "",
     "target": "es2016",
-    "types": ["node"],
     // For Node.js:
     // "lib": ["esnext"],
-    // "types": ["node"],
+    "types": ["node"],
     // and npm install -D @types/node
 
     // Other Outputs
@@ -23,6 +23,7 @@
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
 
     // Style Options
     // "noImplicitReturns": true,
@@ -42,8 +43,9 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
   "exclude": ["__tests__", "dist", "node_modules"]
+  // "files": []
 }

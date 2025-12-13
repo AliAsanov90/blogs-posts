@@ -3,6 +3,7 @@ import { ALL_DATA } from '../../common/constants/routes'
 import { HttpStatus } from '../../common/types/http-statuses.types'
 import {
   blogsCollection,
+  commentsCollection,
   postsCollection,
   usersCollection,
 } from '../../db/mongo.db'
@@ -12,6 +13,7 @@ const deleteAllData = async (req: Request, res: Response) => {
     blogsCollection.deleteMany(),
     postsCollection.deleteMany(),
     usersCollection.deleteMany(),
+    commentsCollection.deleteMany(),
   ])
   res.sendStatus(HttpStatus.NoContent)
 }

@@ -9,5 +9,5 @@ describe('GET home route; /', () => {
 
     expect(res.status).toBe(200)
     expect(res.text).toBe('Hello world!!!')
-  });
-});
+  })
+})

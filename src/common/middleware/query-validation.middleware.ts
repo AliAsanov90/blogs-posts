@@ -1,8 +1,5 @@
 import { query, ValidationChain } from 'express-validator'
-import {
-  SearchQueryFields,
-  TSearchQueryFieldKeys,
-} from '../types/request-response.types'
+import { SearchQueryFields, TSearchQueryFieldKeys } from '../types/request-response.types'
 
 export enum SortDirection {
   Asc = 'asc',
@@ -69,16 +66,12 @@ export const getQueryValidation = <T extends string>(
   const sortByValidation = query('sortBy')
     .default(defaultSortBy)
     .isIn(allowedSortByFields)
-    .withMessage(
-      `Invalid sort field. Allowed values: ${allowedSortByFields.join(', ')}`,
-    )
+    .withMessage(`Invalid sort field. Allowed values: ${allowedSortByFields.join(', ')}`)
 
   const sortDirectionValidation = query('sortDirection')
     .default(DEFAULT_SORT_DIRECTION)
     .isIn(allowedSortDirection)
-    .withMessage(
-      `Invalid sort direction. Allowed values: ${allowedSortDirection.join(', ')}`,
-    )
+    .withMessage(`Invalid sort direction. Allowed values: ${allowedSortDirection.join(', ')}`)
 
   const pageNumberValidation = query('pageNumber')
     .default(DEFAULT_PAGE_NUMBER)
@@ -101,18 +94,15 @@ export const getQueryValidation = <T extends string>(
 
   if (!searchFieldsEnum) return validations
 
-  const searchFieldValidations: Record<TSearchQueryFieldKeys, ValidationChain> =
-    {
-      [SearchQueryFields.searchNameTerm]: searchNameTermValidation,
-      [SearchQueryFields.searchLoginTerm]: searchLoginTermValidation,
-      [SearchQueryFields.searchEmailTerm]: searchEmailTermValidation,
-    }
+  const searchFieldValidations: Record<TSearchQueryFieldKeys, ValidationChain> = {
+    [SearchQueryFields.searchNameTerm]: searchNameTermValidation,
+    [SearchQueryFields.searchLoginTerm]: searchLoginTermValidation,
+    [SearchQueryFields.searchEmailTerm]: searchEmailTermValidation,
+  }
 
   Object.keys(SearchQueryFields).forEach((searchField) => {
     if (searchField in searchFieldsEnum) {
-      validations.push(
-        searchFieldValidations[searchField as TSearchQueryFieldKeys],
-      )
+      validations.push(searchFieldValidations[searchField as TSearchQueryFieldKeys])
     }
   })
 

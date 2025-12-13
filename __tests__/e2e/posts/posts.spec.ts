@@ -1,207 +1,265 @@
 import { Messages } from '../../../src/common/constants/messages'
 import { HttpStatus } from '../../../src/common/types/http-statuses.types'
-import { generateAuthToken } from '../../../src/common/utils/generate-auth-token'
 import { closeDb, runDb } from '../../../src/db/mongo.db'
-import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.types'
-import { PostInput, PostOutput } from '../../../src/features/posts/types/post.types'
+import { BlogOutput } from '../../../src/features/blogs/types/blog.types'
+import { PostOutput } from '../../../src/features/posts/types/post.types'
+import { UserOutput } from '../../../src/features/users/types/user.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
-import { clearDb } from '../../utils/clearDb.util'
 import { postsTestManager } from '../../utils/posts.util'
+import { clearDb, createTestData } from '../../utils/test-helpers.util'
 
-const testBlogData: BlogInput = {
-  name: 'Test name',
-  description: 'Test description',
-  websiteUrl: 'https://website-url.com',
-}
-
-const testPostData: PostInput = {
-  title: 'Test title',
-  shortDescription: 'Test short description',
-  content: 'Test content',
-  blogId: '691fe02e62d2354296c74857'
-}
-
-const incorrectTestPostData: PostInput = {
-  title: '         ',
-  shortDescription: 'Test short description',
-  content: '',
-  blogId: 'blogId'
-}
-
-let createdBlog: BlogOutput
-let createdPost: PostOutput
 
 describe('Posts API', () => {
   const app = setupApp()
-  const { authToken } = generateAuthToken()
+  const postHelper = postsTestManager(app)
 
   beforeAll(async () => {
     await runDb()
   })
-
   afterAll(async () => {
-    await clearDb(app)
     closeDb()
   })
 
-  it('Should create a post; POST /posts', async () => {
-    const createdBlogRes = await blogsTestManager.create({
-      app,
-      token: authToken,
-      data: testBlogData,
+  // POST
+  describe('POST endpoint; POST --> /posts', () => {
+    let createdBlog: BlogOutput
+    let createdPost: PostOutput
+
+    afterAll(async () => {
+      await clearDb(app)
     })
 
-    testPostData.blogId = createdBlogRes.body.id
+    it('Should create a post', async () => {
+      const { blog, post } = await createTestData(app)
 
-    const createdRes = await postsTestManager.create({
-      app,
-      token: authToken,
-      data: testPostData
+      createdBlog = blog
+      createdPost = post
     })
 
-    createdBlog = createdBlogRes.body
-    createdPost = createdRes.body
-  })
-
-  it('Should not create a post if blog does not exist; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
-      token: authToken,
-      data: { ...testPostData, blogId: '691fe02e62d2354296c74851' },
-      httpStatus: HttpStatus.NotFound
+    it('Should not create a post if blog does not exist', async () => {
+      await postHelper.create({
+        data: { blogId: '691fe02e62d2354296c74851' },
+        status: HttpStatus.NotFound,
+      })
     })
-  })
 
-  it('Should not create a post if blogId is not passed in req.body; POST /posts', async () => {
-    const { blogId, ...restTestPostData } = testPostData
-
-    await postsTestManager.create({
-      app,
-      token: authToken,
-      data: restTestPostData,
-      httpStatus: HttpStatus.BadRequest
+    it('Should not create a post if blogId is not passed in req.body', async () => {
+      await postHelper.create({
+        data: { blogId: undefined },
+        status: HttpStatus.BadRequest,
+      })
     })
-  })
 
-  it('Should not create a post without auth header; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
-      data: testPostData,
-      httpStatus: HttpStatus.Unauthorized
+    it('Should not create a post without auth header', async () => {
+      await postHelper.create({
+        token: '',
+        // data: testPostData,
+        status: HttpStatus.Unauthorized,
+      })
     })
-  })
 
-  it('Should not create a post with incorrect auth token; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
-      token: 'Basic sfsdfsdsdfsdsf',
-      data: testPostData,
-      httpStatus: HttpStatus.Unauthorized
+    it('Should not create a post with incorrect auth token', async () => {
+      await postHelper.create({
+        token: 'Basic sfsdfsdsdfsdsf',
+        // data: testPostData,
+        status: HttpStatus.Unauthorized,
+      })
+    })
+
+    it('Should not create a post if body is incorrect', async () => {
+      await postHelper.create({
+        data: { ...createdPost, title: '         ' },
+        status: HttpStatus.BadRequest,
+      })
     })
   })
 
-  it('Should not create a post if body is incorrect; POST /posts', async () => {
-    await postsTestManager.create({
-      app,
-      token: authToken,
-      data: incorrectTestPostData,
-      httpStatus: HttpStatus.BadRequest
+  // GET ALL
+  describe('GET ALL endpoint; GET --> /posts', () => {
+    beforeAll(async () => {
+      await createTestData(app)
+    })
+    afterAll(async () => {
+      await clearDb(app)
+    })
+
+    it('Should get all posts', async () => {
+      const getAllPostsRes = await postHelper.getAll({})
+
+      expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
+      expect(getAllPostsRes.body.items.length).toBe(1)
     })
   })
 
-  it('Should get all posts; GET /posts', async () => {
-    const getAllPostsRes = await postsTestManager.getAll({ app })
+  // GET ONE
+  describe('GET ONE endpoint; GET --> /posts/:id', () => {
+    let createdPost: PostOutput
 
-    expect(getAllPostsRes.body.items).toBeInstanceOf(Array)
-    expect(getAllPostsRes.body.items.length).toBe(1)
-  })
-
-  it('Should get one post; GET /posts/:id', async () => {
-    const getCreatedPostRes = await postsTestManager.getOne({
-      app,
-      id: createdPost.id
+    beforeAll(async () => {
+      const { post } = await createTestData(app)
+      createdPost = post
     })
-    expect(getCreatedPostRes.body.id).toBe(createdPost.id)
-  })
-
-  it('Should update a post; PUT /posts/:id', async () => {
-    await postsTestManager.update({
-      app,
-      id: createdPost.id,
-      token: authToken,
-      data: { ...testPostData, title: 'Test title 2' },
+    afterAll(async () => {
+      await clearDb(app)
     })
 
-    const updatedPostRes = await postsTestManager.getOne({
-      app,
-      id: createdPost.id
-    })
-    expect(updatedPostRes.body.title).toBe('Test title 2')
-  })
-
-  it('Should not update a not found post; UPDATE /posts/:id', async () => {
-    await postsTestManager.update({
-      app,
-      id: '691fe02e62d2354296c74851',
-      token: authToken,
-      data: { ...testPostData, title: 'Test title 3' },
-      httpStatus: HttpStatus.NotFound
+    it('Should get one post', async () => {
+      const getCreatedPostRes = await postHelper.getOne({
+        id: createdPost.id,
+      })
+      expect(getCreatedPostRes.body.id).toBe(createdPost.id)
     })
   })
 
-  it('Should not update a post if given blogId is different from post.blogId; UPDATE /posts/:id', async () => {
-    const differentBlogRes = await blogsTestManager.create({
-      app,
-      token: authToken,
-      data: testBlogData,
+  // UPDATE
+  describe('UPDATE endpoint; PUT --> /posts/:id', () => {
+    let createdPost: PostOutput
+
+    beforeAll(async () => {
+      const { post } = await createTestData(app)
+      createdPost = post
+    })
+    afterAll(async () => {
+      await clearDb(app)
     })
 
-    const res = await postsTestManager.update({
-      app,
-      id: createdPost.id,
-      token: authToken,
-      data: {
-        ...testPostData,
-        title: 'Test title 4',
-        blogId: differentBlogRes.body.id
-      },
-      httpStatus: HttpStatus.BadRequest
+    it('Should update a post', async () => {
+      await postHelper.update({
+        id: createdPost.id,
+        data: { ...createdPost, title: 'Test title 2' },
+      })
+
+      const updatedPostRes = await postHelper.getOne({
+        id: createdPost.id,
+      })
+      expect(updatedPostRes.body.title).toBe('Test title 2')
     })
-    expect(res.body.message).toBe(Messages.BlogNotCorrespondPost)
+
+    it('Should not update a not found post', async () => {
+      await postHelper.update({
+        id: '691fe02e62d2354296c74851',
+        data: { ...createdPost, title: 'Test title 3' },
+        status: HttpStatus.NotFound,
+      })
+    })
+
+    it('Should not update a post if given blogId is different from post.blogId', async () => {
+      const otherBlogRes = await blogsTestManager(app).create({})
+
+      const res = await postHelper.update({
+        id: createdPost.id,
+        data: {
+          ...createdPost,
+          title: 'Test title 4',
+          blogId: otherBlogRes.body.id,
+        },
+        status: HttpStatus.BadRequest,
+      })
+      expect(res.body.message).toBe(Messages.post.blogNotCorrespondPost)
+    })
   })
 
-  it('Should delete a post; DELETE /posts/:id', async () => {
-    const postsResBefore = await postsTestManager.getAll({ app })
-    expect(postsResBefore.body.items.length).toBe(1)
+  // DELETE
+  describe('DELETE endpoint; DELETE --> /posts/:id', () => {
+    let createdPost: PostOutput
 
-    await postsTestManager.getOne({
-      app,
-      id: createdPost.id,
+    beforeAll(async () => {
+      const { post } = await createTestData(app)
+      createdPost = post
+    })
+    afterAll(async () => {
+      await clearDb(app)
     })
 
-    await postsTestManager.delete({
-      app,
-      id: createdPost.id,
-      token: authToken
+    it('Should delete a post', async () => {
+      const postsResBefore = await postHelper.getAll({})
+      expect(postsResBefore.body.items.length).toBe(1)
+
+      await postHelper.getOne({
+        id: createdPost.id,
+      })
+
+      await postHelper.delete({
+        id: createdPost.id,
+      })
+
+      await postHelper.getOne({
+        id: createdPost.id,
+        status: HttpStatus.NotFound,
+      })
+
+      const postsResAfter = await postHelper.getAll({})
+      expect(postsResAfter.body.items.length).toBe(0)
     })
 
-    await postsTestManager.getOne({
-      app,
-      id: createdPost.id,
-      httpStatus: HttpStatus.NotFound
+    it('Should not delete a not found post', async () => {
+      await postHelper.delete({
+        id: '691fe02e62d2354296c74851',
+        status: HttpStatus.NotFound,
+      })
     })
-
-    const postsResAfter = await postsTestManager.getAll({ app })
-    expect(postsResAfter.body.items.length).toBe(0)
   })
 
-  it('Should not delete a not found post; DELETE /posts/:id', async () => {
-    await postsTestManager.delete({
-      app,
-      id: '691fe02e62d2354296c74851',
-      token: authToken,
-      httpStatus: HttpStatus.NotFound
+  // CREATE A COMMENT BY POST ID
+  describe('CREATE COMMENT endpoint; POST --> /posts/:postId/comments', () => {
+    let createdPost: PostOutput
+    let createdUser: UserOutput
+    let accessToken: string
+
+    beforeAll(async () => {
+      const { post, user, userAccessToken } = await createTestData(app)
+      createdPost = post
+      createdUser = user
+      accessToken = userAccessToken
+    })
+    afterAll(async () => {
+      await clearDb(app)
+    })
+
+    it('Should create a comment by post id', async () => {
+      await postHelper.createComment({
+        token: accessToken,
+        postId: createdPost.id,
+      })
+    })
+
+    it('Should throw error if comment content less than 20 chars', async () => {
+      await postHelper.createComment({
+        token: accessToken,
+        postId: createdPost.id,
+        data: { content: 'adasd' },
+        status: HttpStatus.BadRequest
+      })
+    })
+  })
+
+  // GET ALL COMMENTS BY POST ID
+  describe('GET ALL COMMENTS endpoint; GET --> /posts/:postId/comments', () => {
+    let createdPost: PostOutput
+    let accessToken: string
+
+    beforeAll(async () => {
+      const { post, userAccessToken } = await createTestData(app)
+      createdPost = post
+      accessToken = userAccessToken
+    })
+    afterAll(async () => {
+      await clearDb(app)
+    })
+
+    it('Should find all comments by post id', async () => {
+      const allCommentsBeforeRes = await postHelper.getAllComments({ postId: createdPost.id })
+      expect(allCommentsBeforeRes.body.items).toHaveLength(1)
+
+      await postHelper.createComment({
+        token: accessToken,
+        postId: createdPost.id,
+        data: { content: 'adasdasdasdasdasdassdsdasd' }
+      })
+
+      const allCommentsAfterRes = await postHelper.getAllComments({ postId: createdPost.id })
+      expect(allCommentsAfterRes.body.items).toHaveLength(2)
     })
   })
 })

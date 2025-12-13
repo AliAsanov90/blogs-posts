@@ -1,12 +1,8 @@
-import { ObjectId, WithId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { blogsCollection } from '../../../db/mongo.db'
 import { Blog } from '../types/blog.types'
 
 class BlogRepository {
-  public async getOne(id: string): Promise<WithId<Blog> | null> {
-    return blogsCollection.findOne({ _id: new ObjectId(id) })
-  }
-
   public async create(blog: Blog): Promise<string> {
     const { insertedId } = await blogsCollection.insertOne(blog)
     return insertedId.toString()

@@ -5,8 +5,8 @@ import { BlogInput, BlogOutput } from '../../../src/features/blogs/types/blog.ty
 import { PostInput } from '../../../src/features/posts/types/post.types'
 import { setupApp } from '../../../src/setupApp'
 import { blogsTestManager } from '../../utils/blogs.util'
-import { clearDb } from '../../utils/clearDb.util'
 import { postsTestManager } from '../../utils/posts.util'
+import { clearDb } from '../../utils/test-helpers.util'
 
 const testBlogData: BlogInput = {
   name: 'Test name',
@@ -22,14 +22,14 @@ const updatedTestBlogData: BlogInput = {
 const incorrectTestBlogData: BlogInput = {
   name: '         ',
   description: 'Test short description',
-  websiteUrl: 'websiteUrl'
+  websiteUrl: 'websiteUrl',
 }
 
 const testPostData: PostInput = {
   title: 'Test title',
   shortDescription: 'Test short description',
   content: 'Test content',
-  blogId: '691fe02e62d2354296c74857'
+  blogId: '691fe02e62d2354296c74857',
 }
 
 let createdBlog: BlogOutput
@@ -37,6 +37,8 @@ let createdBlog: BlogOutput
 describe('Blogs API', () => {
   const app = setupApp()
   const { authToken } = generateAuthToken()
+  const blogHelper = blogsTestManager(app)
+  const postHelper = postsTestManager(app)
 
   beforeAll(async () => {
     await runDb()
@@ -49,13 +51,12 @@ describe('Blogs API', () => {
   // CREATE
 
   it('Should create a blog; POST /blogs', async () => {
-    const createdBlogRes = await blogsTestManager.create({
-      app,
+    const createdBlogRes = await blogHelper.create({
       token: authToken,
-      data: testBlogData
+      data: testBlogData,
     })
 
-    const blogsRes = await blogsTestManager.getAll({ app })
+    const blogsRes = await blogHelper.getAll({})
 
     expect(createdBlogRes.body.name).toBe(testBlogData.name)
     expect(blogsRes.body.items).toBeInstanceOf(Array)
@@ -65,53 +66,48 @@ describe('Blogs API', () => {
   })
 
   it('Should not create a blog without auth header; POST /blogs', async () => {
-    await blogsTestManager.create({
-      app,
-      token: undefined,
+    await blogHelper.create({
+      token: '',
       data: testBlogData,
-      httpStatus: HttpStatus.Unauthorized
+      status: HttpStatus.Unauthorized,
     })
   })
 
   it('Should not create a blog with incorrect auth token; POST /blogs', async () => {
-    await blogsTestManager.create({
-      app,
+    await blogHelper.create({
       token: 'Basic sfsdfsdsdfsdsf',
       data: testBlogData,
-      httpStatus: HttpStatus.Unauthorized
+      status: HttpStatus.Unauthorized,
     })
   })
 
   it('Should not create a blog if body is incorrect; POST /blogs', async () => {
-     await blogsTestManager.create({
-      app,
+    await blogHelper.create({
       token: authToken,
       data: incorrectTestBlogData,
-      httpStatus: HttpStatus.BadRequest
+      status: HttpStatus.BadRequest,
     })
   })
 
   // GET ALL
 
   it('Should get all blogs; GET /blogs', async () => {
-    const getAllBlogsRes = await blogsTestManager.getAll({ app })
+    const getAllBlogsRes = await blogHelper.getAll({})
 
     expect(getAllBlogsRes.body.items).toBeInstanceOf(Array)
     expect(getAllBlogsRes.body.items.length).toBe(1)
   })
 
   it('Should get blogs that match "searchNameTerm" query param; GET /blogs?searchNameTerm={MATCH}', async () => {
-    const getBlogsRes = await blogsTestManager.getAll({
-      app,
-      query: { searchNameTerm: 'test' }
+    const getBlogsRes = await blogHelper.getAll({
+      query: { searchNameTerm: 'test' },
     })
     expect(getBlogsRes.body.items.length).toBe(1)
   })
 
   it('Shouldn\'t get any blogs if "searchNameTerm" query does not match; GET /blogs?searchNameTerm={NOT_MATCH}', async () => {
-    const getBlogsRes = await blogsTestManager.getAll({
-      app,
-      query: { searchNameTerm: 'blog' }
+    const getBlogsRes = await blogHelper.getAll({
+      query: { searchNameTerm: 'blog' },
     })
     expect(getBlogsRes.body.items.length).toBe(0)
   })
@@ -119,39 +115,34 @@ describe('Blogs API', () => {
   // GET ONE
 
   it('Should get one blog; GET /blogs/:id', async () => {
-    const getOneRes = await blogsTestManager.getOne({
-      app,
-      id: createdBlog.id
+    const getOneRes = await blogHelper.getOne({
+      id: createdBlog.id,
     })
     expect(getOneRes.body.id).toBe(createdBlog.id)
   })
 
   it('Should return NotFound if blog not existing; GET /blogs/:id', async () => {
-    await blogsTestManager.getOne({
-      app,
+    await blogHelper.getOne({
       id: '691fe02e62d2354296c74851',
-      httpStatus: HttpStatus.NotFound
+      status: HttpStatus.NotFound,
     })
   })
 
   // GET POSTS BY BLOG ID
 
   it('Should get posts of specific blog; GET /blogs/:blogId/posts', async () => {
-    const getBlogPostsResBefore = await blogsTestManager.getPostsByBlogId({
-      app,
-      blogId: createdBlog.id
+    const getBlogPostsResBefore = await blogHelper.getPostsByBlogId({
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResBefore.body.items.length).toBe(0)
 
-    await postsTestManager.create({
-      app,
+    await postHelper.create({
       token: authToken,
-      data: { ...testPostData, blogId: createdBlog.id }
+      data: { ...testPostData, blogId: createdBlog.id },
     })
 
-    const getBlogPostsResAfter = await blogsTestManager.getPostsByBlogId({
-      app,
-      blogId: createdBlog.id
+    const getBlogPostsResAfter = await blogHelper.getPostsByBlogId({
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResAfter.body.items.length).toBe(1)
   })
@@ -159,24 +150,21 @@ describe('Blogs API', () => {
   // CREATE A POST BY BLOG ID
 
   it('Should create a post for specific blog; POST /blogs/:blogId/posts', async () => {
-    const getBlogPostsResBefore = await blogsTestManager.getPostsByBlogId({
-      app,
-      blogId: createdBlog.id
+    const getBlogPostsResBefore = await blogHelper.getPostsByBlogId({
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResBefore.body.items.length).toBe(1)
 
     const { blogId, ...restData } = testPostData
 
-    await blogsTestManager.createPostByBlogId({
-      app,
+    await blogHelper.createPostByBlogId({
       token: authToken,
       blogId: createdBlog.id,
-      data: restData
+      data: restData,
     })
 
-    const getBlogPostsResAfter = await blogsTestManager.getPostsByBlogId({
-      app,
-      blogId: createdBlog.id
+    const getBlogPostsResAfter = await blogHelper.getPostsByBlogId({
+      blogId: createdBlog.id,
     })
     expect(getBlogPostsResAfter.body.items.length).toBe(2)
   })
@@ -184,68 +172,61 @@ describe('Blogs API', () => {
   // UPDATE
 
   it('Should update a blog; PUT /blogs/:id', async () => {
-    await blogsTestManager.update({
-      app,
+    await blogHelper.update({
       id: createdBlog.id,
       token: authToken,
       data: updatedTestBlogData,
     })
 
-    const updatedPostRes = await blogsTestManager.getOne({
-      app,
-      id: createdBlog.id
+    const updatedPostRes = await blogHelper.getOne({
+      id: createdBlog.id,
     })
 
     expect(updatedPostRes.body).toEqual({
       ...updatedPostRes.body,
       ...updatedTestBlogData,
-      id: createdBlog.id
+      id: createdBlog.id,
     })
   })
 
   it('Should not update blog if blog not found; PUT /blogs/:id', async () => {
-    await blogsTestManager.update({
-      app,
+    await blogHelper.update({
       id: '691fe02e62d2354296c74851',
       token: authToken,
       data: testBlogData,
-      httpStatus: HttpStatus.NotFound
+      status: HttpStatus.NotFound,
     })
   })
 
   // DELETE
 
   it('Should delete a blog; DELETE /blogs/:id', async () => {
-    await blogsTestManager.getOne({
-      app,
+    await blogHelper.getOne({
       id: createdBlog.id,
     })
 
-    const blogsResBefore = await blogsTestManager.getAll({ app })
+    const blogsResBefore = await blogHelper.getAll({})
     expect(blogsResBefore.body.items.length).toBe(1)
 
-    await blogsTestManager.delete({
-      app,
+    await blogHelper.delete({
       id: createdBlog.id,
       token: authToken,
     })
 
-    await blogsTestManager.getOne({
-      app,
+    await blogHelper.getOne({
       id: createdBlog.id,
-      httpStatus: HttpStatus.NotFound
+      status: HttpStatus.NotFound,
     })
 
-    const blogsResAfter = await blogsTestManager.getAll({ app })
+    const blogsResAfter = await blogHelper.getAll({})
     expect(blogsResAfter.body.items.length).toBe(0)
   })
 
   it('Should not delete a not found blog; DELETE /blogs/:id', async () => {
-    await blogsTestManager.delete({
-      app,
+    await blogHelper.delete({
       id: '691fe02e62d2354296c74851',
       token: authToken,
-      httpStatus: HttpStatus.NotFound
+      status: HttpStatus.NotFound,
     })
   })
 })

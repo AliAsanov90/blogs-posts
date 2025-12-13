@@ -9,20 +9,22 @@
   "packageManager": "pnpm@10.20.0",
   "scripts": {
     "ts:watch": "tsc -w",
-    "dev": "nodemon --inspect ./dist/index.js",
+    "dev": "nodemon --inspect=0.0.0.0:9229 ./dist/index.js",
     "dev:watch": "concurrently 'pnpm ts:watch' 'pnpm dev'",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "lint:fix": "eslint 'src/**/*.{ts,js}' --fix",
     "test": "jest -i",
     "test:watch": "jest -i --watch",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-validator": "^7.3.0",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0"
   },
   "devDependencies": {
@@ -31,6 +33,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
